@@ -21,5 +21,7 @@
   "countryError": "Country required!",
   "zone": "Zone",
   "zoneError": "Zone required!",
-  "buttonConfirm": "Confirm"
+  "buttonConfirm": "Confirm",
+  "deliveryAddress": "My delivery and billing addresses are the same.",
+  "requiredError": "required!"
 }

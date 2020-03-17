@@ -2,11 +2,11 @@
     <vf-o-apollo class="vf-e-store-checkout" v-slot="{data: response}" @loaded="handleLoaded">
       <vf-o-form @submit="onSubmit">
         <vf-m-row>
-          <vf-m-col md="6" sm="12">
-            <vf-o-payment-address :address="response.paymentAddress" :countries="response.countriesList" class="mb-3"/>
-            <vf-o-shipping-address :address="response.shippingAddress" :countries="response.countriesList"/>
+          <vf-m-col md="5" sm="12">
+            <vf-o-payment-address ref="paymentAddress" :address="response.paymentAddress" :countries="response.countriesList" :zones="paymentZones" class="mb-3" @updateDeliveryAddress="deliveryAddress = $event"/>
+            <vf-o-shipping-address v-if="!deliveryAddress" ref="shippingAddress" :address="response.shippingAddress" :countries="response.countriesList" :zones="shippingZones"/>
           </vf-m-col>
-          <vf-m-col md="6" sm="12">
+          <vf-m-col md="7" sm="12">
             <vf-o-cart-products :cart="cart" />
           </vf-m-col>
         </vf-m-row>
@@ -20,18 +20,37 @@
 <script>
 import { validationMixin } from "vuelidate";
 import {mapGetters} from 'vuex'
+import {find} from 'lodash'
+import required from "vuelidate/lib/validators/required";
+import minLength from "vuelidate/lib/validators/minLength";
+import maxLength from "vuelidate/lib/validators/maxLength";
 export default {
+  data() {
+    return {
+      deliveryAddress: true
+    }
+  },
   mixins: [validationMixin],
   computed: {
     ...mapGetters({
-      cart: 'store/cart/get'
+      cart: 'store/cart/get',
+      paymentZones: 'store/checkout/paymentAddress/zones',
+      shippingZones: 'store/checkout/shippingAddress/zones'
     })
   },
   methods: {
     async onSubmit() {
-
+      this.$refs.paymentAddress.$v.$touch()
+      if(!this.deliveryAddress) {
+        this.$refs.shippingAddress.$v.$touch()
+      }
+      if (!this.$refs.paymentAddress.$v.form.$invalid && (!this.deliveryAddress && !this.$refs.shippingAddress.$v.form.$invalid) ) {
+        console.log('valid')
+      } else {
+        console.log('invalid')
+      }
     },
-    handleLoaded({cart}) {
+    handleLoaded({cart, paymentAddress, shippingAddress}) {
       this.$store.commit('store/cart/setCart', cart)
     }
   }

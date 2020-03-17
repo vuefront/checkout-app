@@ -1,4 +1,4 @@
 import checkout from './checkout'
-export {
+export default {
   checkout
 }
