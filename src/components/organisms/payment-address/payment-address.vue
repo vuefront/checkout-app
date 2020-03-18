@@ -4,7 +4,7 @@
     :title="$t('modules.store.checkout.paymentAddressTitle')"
   >
     <vf-m-field
-      v-for="(value, index) in address"
+      v-for="(value, index) in address.fields"
       :id="`input-payment-address-${value.name}`"
       :state="$v.form[value.name].$dirty ? !$v.form[value.name].$error : null"
       :key="index"
@@ -54,6 +54,9 @@
     <vf-a-checkbox v-model="deliveryAddress" >
       {{$t(`modules.store.checkout.deliveryAddress`)}}
     </vf-a-checkbox>
+    <vf-a-checkbox v-model="agree" v-if="address.agree" >
+      <span v-html="address.agree"></span>
+    </vf-a-checkbox>
   </vf-m-card>
 </template>
 <script>
@@ -65,7 +68,7 @@ export default {
   mixins: [validationMixin],
   props: {
     address: {
-      type: Array,
+      type: Object,
       default () {
         return null
       }
@@ -85,11 +88,12 @@ export default {
   },
   data () {
     let form = {}
-    for (const key in this.address) {
-      form[this.address[key].name] = null
+    for (const key in this.address.fields) {
+      form[this.address.fields[key].name] = null
     }
     return {
       deliveryAddress: true,
+      agree: null,
       form
     }
   },
@@ -103,10 +107,10 @@ export default {
   validations() {
     let fields = {};
 
-    for (const key in this.address) {
-      fields[this.address[key].name] = {}
-      if(this.address[key].required) {
-        fields[this.address[key].name]['required'] = required
+    for (const key in this.address.fields) {
+      fields[this.address.fields[key].name] = {}
+      if(this.address.fields[key].required) {
+        fields[this.address.fields[key].name]['required'] = required
       }
     }
 

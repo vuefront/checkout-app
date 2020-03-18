@@ -1,5 +1,7 @@
 {
+  "paymentMethodsTitle": "Payment Methods",
   "paymentAddressTitle": "Payment Address",
+  "shippingMethodsTitle": "Shipping Methods",
   "shippingAddressTitle": "Shipping Address",
   "firstName": "First Name",
   "firstNameError":  "First Name must be between 1 and 32 characters!",

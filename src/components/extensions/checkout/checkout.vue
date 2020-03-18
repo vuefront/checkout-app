@@ -7,6 +7,8 @@
             <vf-o-shipping-address v-if="!deliveryAddress" ref="shippingAddress" :address="response.shippingAddress" :countries="response.countriesList" :zones="shippingZones"/>
           </vf-m-col>
           <vf-m-col md="7" sm="12">
+            <vf-o-payment-methods ref="paymentMethods" :methods="response.paymentMethods" class="mb-3"/>
+            <vf-o-shipping-methods :methods="response.shippingMethods" class="mb-3"/>
             <vf-o-cart-products :cart="cart" />
           </vf-m-col>
         </vf-m-row>
@@ -41,6 +43,7 @@ export default {
   methods: {
     async onSubmit() {
       this.$refs.paymentAddress.$v.$touch()
+      this.$refs.paymentMethods.$v.$touch()
       if(!this.deliveryAddress) {
         this.$refs.shippingAddress.$v.$touch()
       }
@@ -64,14 +67,27 @@ export default {
       name
     }
   }
-	paymentAddress {
-    type
+  paymentMethods {
+    id
+    codename
     name
-    label
-    required
-    values {
-      text
-      value
+  }
+  shippingMethods {
+    id
+    codename
+    name
+  }
+	paymentAddress {
+    agree
+    fields {
+      type
+      name
+      label
+      required
+      values {
+        text
+        value
+      }
     }
   }
   shippingAddress {

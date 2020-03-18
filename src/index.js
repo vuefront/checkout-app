@@ -9,7 +9,9 @@ export default {
   },
   organisms: {
     ShippingAddress: 'organisms/shipping-address/shipping-address.vue',
-    PaymentAddress: 'organisms/payment-address/payment-address.vue'
+    PaymentAddress: 'organisms/payment-address/payment-address.vue',
+    PaymentMethods: 'organisms/payment-methods/payment-methods.vue',
+    ShippingMethods: 'organisms/shipping-methods/shipping-methods.vue'
   },
   locales: {
     'en-gb': ['en-gb'],
