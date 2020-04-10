@@ -27,6 +27,11 @@ export default {
       method: null
     }
   },
+  watch: {
+    method(value) {
+      this.$emit('input', value)
+    }
+  },
   validations() {
     return {
       method: {

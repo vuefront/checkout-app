@@ -28,6 +28,10 @@ export default {
     {
       path: ['store', 'checkout', 'shippingAddress'],
       module: 'store/checkout/shippingAddress/shippingAddress.js'
+    },
+    {
+      path: ['store', 'checkout', 'order'],
+      module: 'store/checkout/order/order.js'
     }
   ]
 }

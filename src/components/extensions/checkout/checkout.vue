@@ -7,8 +7,8 @@
             <vf-o-shipping-address v-if="!deliveryAddress" ref="shippingAddress" :address="response.shippingAddress" :countries="response.countriesList" :zones="shippingZones"/>
           </vf-m-col>
           <vf-m-col md="7" sm="12">
-            <vf-o-payment-methods ref="paymentMethods" :methods="response.paymentMethods" class="mb-3"/>
-            <vf-o-shipping-methods :methods="response.shippingMethods" class="mb-3"/>
+            <vf-o-payment-methods ref="paymentMethods" :methods="response.paymentMethods" @input="paymentMethod = $event" class="mb-3"/>
+            <vf-o-shipping-methods ref="shippingMethods" :methods="response.shippingMethods" @input="shippingMethod = $event" class="mb-3"/>
             <vf-o-cart-products :cart="cart" />
           </vf-m-col>
         </vf-m-row>
@@ -29,12 +29,16 @@ import maxLength from "vuelidate/lib/validators/maxLength";
 export default {
   data() {
     return {
-      deliveryAddress: true
+      deliveryAddress: true,
+      paymentMethod: '',
+      shippingMethod: ''
     }
   },
   mixins: [validationMixin],
   computed: {
     ...mapGetters({
+      url: 'store/checkout/order/url',
+      error: 'vuefront/error',
       cart: 'store/cart/get',
       paymentZones: 'store/checkout/paymentAddress/zones',
       shippingZones: 'store/checkout/shippingAddress/zones'
@@ -44,13 +48,46 @@ export default {
     async onSubmit() {
       this.$refs.paymentAddress.$v.$touch()
       this.$refs.paymentMethods.$v.$touch()
+      this.$refs.shippingMethods.$v.$touch()
+
       if(!this.deliveryAddress) {
         this.$refs.shippingAddress.$v.$touch()
       }
-      if (!this.$refs.paymentAddress.$v.form.$invalid && (!this.deliveryAddress && !this.$refs.shippingAddress.$v.form.$invalid) ) {
-        console.log('valid')
-      } else {
-        console.log('invalid')
+
+      if (!this.$refs.paymentAddress.$v.form.$invalid) {
+        if(this.deliveryAddress || (!this.deliveryAddress  && !this.$refs.shippingAddress.$v.form.$invalid)) {
+          let paymentAddress = []
+          let shippingAddress = []
+
+          for(const key in this.$refs.paymentAddress._data.form) {
+            paymentAddress = [...paymentAddress, {
+              name: key,
+              value: this.$refs.paymentAddress._data.form[key]
+            }]
+          }
+
+          if(this.deliveryAddress) {
+            shippingAddress = paymentAddress
+          } else {
+            for(const key in this.$refs.shippingAddress._data.form) {
+              shippingAddress = [...shippingAddress, {
+                name: key,
+                value: this.$refs.shippingAddress._data.form[key]
+              }]
+            }
+          }
+
+          await this.$store.dispatch('store/checkout/order/create', {
+            paymentAddress,
+            shippingAddress,
+            paymentMethod: this.paymentMethod,
+            shippingMethod: this.shippingMethod
+          })
+
+          if(!this.error) {
+            window.location.href = this.url
+          }
+        }
       }
     },
     handleLoaded({cart, paymentAddress, shippingAddress}) {
