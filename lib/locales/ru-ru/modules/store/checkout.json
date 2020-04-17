@@ -1,5 +1,7 @@
 {
+  "paymentMethodsTitle": "Payment Methods",
   "paymentAddressTitle": "Payment Address",
+  "shippingMethodsTitle": "Shipping Methods",
   "shippingAddressTitle": "Shipping Address",
   "firstName": "First Name",
   "firstNameError":  "First Name must be between 1 and 32 characters!",
@@ -17,9 +19,13 @@
   "cityError": "City must be between 2 and 128 characters!",
   "postcode": "Post Code",
   "postcodeError": "Postcode must be between 2 and 10 characters!",
+  "phone": "Telephone",
+  "phoneError": "Telephone required!",
   "country": "Country",
   "countryError": "Country required!",
   "zone": "Zone",
   "zoneError": "Zone required!",
-  "buttonConfirm": "Confirm"
+  "buttonConfirm": "Confirm",
+  "deliveryAddress": "My delivery and billing addresses are the same.",
+  "requiredError": "required!"
 }

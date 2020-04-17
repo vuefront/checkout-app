@@ -19,6 +19,8 @@
   "cityError": "City must be between 2 and 128 characters!",
   "postcode": "Post Code",
   "postcodeError": "Postcode must be between 2 and 10 characters!",
+  "phone": "Telephone",
+  "phoneError": "Telephone required!",
   "country": "Country",
   "countryError": "Country required!",
   "zone": "Zone",

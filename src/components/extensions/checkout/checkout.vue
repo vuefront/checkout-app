@@ -3,8 +3,8 @@
       <vf-o-form @submit="onSubmit">
         <vf-m-row>
           <vf-m-col md="5" sm="12">
-            <vf-o-payment-address ref="paymentAddress" :address="response.paymentAddress" :countries="response.countriesList" :zones="paymentZones" class="mb-3" @updateDeliveryAddress="deliveryAddress = $event"/>
-            <vf-o-shipping-address v-if="!deliveryAddress" ref="shippingAddress" :address="response.shippingAddress" :countries="response.countriesList" :zones="shippingZones"/>
+            <vf-o-payment-address ref="paymentAddress" :delivery="response.shippingAddress.length > 0" :address="response.paymentAddress" :countries="response.countriesList" :zones="paymentZones" class="mb-3" @updateDeliveryAddress="deliveryAddress = $event"/>
+            <vf-o-shipping-address v-if="!deliveryAddress && response.shippingAddress.length > 0" ref="shippingAddress" :address="response.shippingAddress" :countries="response.countriesList" :zones="shippingZones"/>
           </vf-m-col>
           <vf-m-col md="7" sm="12">
             <vf-o-payment-methods ref="paymentMethods" :methods="response.paymentMethods" @input="paymentMethod = $event" class="mb-3"/>

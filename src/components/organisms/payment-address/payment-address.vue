@@ -51,7 +51,7 @@
         $t(`modules.store.checkout.${value.name}Error`):
         value.name}}</template>
     </vf-m-field>
-    <vf-a-checkbox v-model="deliveryAddress" >
+    <vf-a-checkbox v-if="delivery" v-model="deliveryAddress" >
       {{$t(`modules.store.checkout.deliveryAddress`)}}
     </vf-a-checkbox>
     <vf-a-checkbox v-model="agree" v-if="address.agree" >
@@ -83,6 +83,12 @@ export default {
       type: Object,
       default () {
         return null
+      }
+    },
+    delivery: {
+      type: Boolean,
+      default () {
+        return true
       }
     }
   },
