@@ -1,0 +1,8 @@
+mutation($paymentAddress: [InputField], $shippingAddress: [InputField], $paymentMethod: String, $shippingMethod: String) {
+  createOrder(paymentAddress: $paymentAddress, shippingAddress: $shippingAddress, paymentMethod: $paymentMethod, shippingMethod: $shippingMethod) {
+    order {
+      id
+    }
+    url
+  }
+}

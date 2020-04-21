@@ -104,6 +104,12 @@ export default {
     }
   },
   watch: {
+    form: {
+      handler(value, oldValue) {
+        this.$emit('input', value)
+      },
+      deep: true
+    },
     deliveryAddress(value, oldValue) {
       if(value !== oldValue) {
         this.$emit('updateDeliveryAddress', value)

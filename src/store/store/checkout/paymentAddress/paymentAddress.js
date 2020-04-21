@@ -19,19 +19,17 @@ export const mutations = {
 }
 
 export const actions = {
-  async zones({ commit, dispatch, rootGetters }, zoneData) {
-    await dispatch(
-      'apollo/query',
-      {
+  async zones({ commit }, zoneData) {
+    try {
+      const {data} = await this.$vfapollo
+      .query({
         query: ZonesGql,
         variables: zoneData
-      },
-      {
-        root: true
-      }
-    )
-    if (!rootGetters['vuefront/error']) {
-      commit('setZones', rootGetters['apollo/get'].zonesList)
+      })
+      commit('setZones', data.zonesList)
+    } catch (e) {
+      console.log(e)
+      commit('vuefront/setResponseError', e, {root: true})
     }
   }
 }

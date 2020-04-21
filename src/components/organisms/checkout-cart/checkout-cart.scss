@@ -1,0 +1,27 @@
+.vf-e-store-checkout__cart {
+  &__products {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    &_thumb {
+    }
+    &_price {
+      padding-right: 30px;
+    }
+    &_quantity {
+      flex: 1;
+      padding-left: 30px;
+      text-align: left;
+    }
+    &_actions {
+
+    }
+  }
+  &__totals {
+    margin-top: 30px;
+
+  }
+  &__total {
+    padding-bottom: 10px;
+  }
+}

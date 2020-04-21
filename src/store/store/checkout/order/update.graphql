@@ -1,0 +1,13 @@
+mutation($paymentAddress: [InputField], $shippingAddress: [InputField], $paymentMethod: String, $shippingMethod: String) {
+  updateOrder(paymentAddress: $paymentAddress, shippingAddress: $shippingAddress, paymentMethod: $paymentMethod, shippingMethod: $shippingMethod) {
+    shippingMethods {
+      id
+      codename
+      name
+    }
+    totals {
+      title
+      text
+    }
+  }
+}

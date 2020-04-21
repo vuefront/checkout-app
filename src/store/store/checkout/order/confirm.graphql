@@ -1,0 +1,8 @@
+mutation {
+  confirmOrder {
+    order {
+      id
+    }
+    url
+  }
+}

@@ -84,6 +84,14 @@ export default {
       }
     }
   },
+  watch: {
+    form: {
+      handler(value, oldValue) {
+        this.$emit('input', value)
+      },
+      deep: true
+    },
+  },
   data () {
     let form = {}
     for (const key in this.address) {
