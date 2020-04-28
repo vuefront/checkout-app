@@ -1,5 +1,5 @@
 <template>
-      <vf-o-form @submit="onSubmit" v-if="!loading">
+      <vf-o-form @submit="onSubmit" v-if="!loading" :button="false">
         <vf-m-row>
           <vf-m-col md="4" sm="12">
             <vf-o-payment-address
@@ -41,12 +41,14 @@
               </vf-m-col>
             </vf-m-row>
             <vf-o-checkout-cart :cart="cart" :totals="response.totals"/>
+            <div class="mt-4 text-right">
+              <vf-a-button type="submit" color="primary" :disabled="updating">
+                {{$t('modules.store.checkout.buttonConfirm')}}
+                  <vf-a-icon icon="long-arrow-alt-right" size="sm" />
+              </vf-a-button>
+            </div>
           </vf-m-col>
         </vf-m-row>
-        <template #button>
-          {{$t('modules.store.checkout.buttonConfirm')}}
-          <vf-a-icon icon="long-arrow-alt-right" size="sm" />
-        </template>
       </vf-o-form>
       <vf-a-loader v-else/>
 </template>
@@ -68,7 +70,8 @@ export default {
       paymentMethod: '',
       shippingMethod: '',
       paymentAddress: {},
-      shippingAddress: {}
+      shippingAddress: {},
+      updating: false
     }
   },
   mixins: [validationMixin],
@@ -156,6 +159,7 @@ export default {
       this.debounced()
     },
     async updateOrder() {
+      this.updating = true
       const data = await this.$store.dispatch('store/checkout/order/update', {
         paymentAddress: this.paymentAddressData,
         shippingAddress: this.shippingAddressData,
@@ -165,6 +169,7 @@ export default {
       if(data) {
         this.response = {...this.response, ...data.updateOrder}
       }
+      this.updating = false
     },
     async onSubmit() {
       this.$refs.paymentAddress.$v.$touch()
@@ -175,9 +180,12 @@ export default {
         this.$refs.shippingAddress.$v.$touch()
       }
 
+
       if (!this.$refs.paymentAddress.$v.form.$invalid && !this.$refs.shippingMethods.$v.method.$invalid && !this.$refs.paymentMethods.$v.method.$invalid) {
         if(this.deliveryAddress || (!this.deliveryAddress  && !this.$refs.shippingAddress.$v.form.$invalid)) {
+          this.updating = true
           await this.$store.dispatch('store/checkout/order/confirm')
+          this.updating = false
 
           if(!this.error) {
             window.location.href = this.url

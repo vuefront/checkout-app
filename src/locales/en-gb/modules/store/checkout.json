@@ -26,6 +26,8 @@
   "country_idError": "Country required!",
   "zone_id": "Zone",
   "zone_idError": "Zone required!",
+  "state": "State",
+  "stateError": "State required!",
   "country": "Country",
   "countryError": "Country required!",
   "zone": "Zone",
