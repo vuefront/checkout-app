@@ -11,8 +11,10 @@
     }
     &_quantity {
       flex: 1;
-      padding-left: 30px;
-      text-align: left;
+      text-align: right;
+      display: flex;
+      justify-content: flex-end;
+      padding-right: 30px;
     }
     &_actions {
 
