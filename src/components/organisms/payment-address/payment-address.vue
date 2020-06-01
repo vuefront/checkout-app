@@ -66,6 +66,22 @@ import minLength from "vuelidate/lib/validators/minLength";
 import maxLength from "vuelidate/lib/validators/maxLength";
 export default {
   mixins: [validationMixin],
+  fragments:{
+    fields:  `
+      paymentAddress {
+        agree
+        fields {
+          type
+          name
+          label
+          required
+          values {
+            text
+            value
+          }
+        }
+      }`
+  },
   props: {
     address: {
       type: Object,

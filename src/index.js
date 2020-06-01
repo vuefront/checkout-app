@@ -11,6 +11,7 @@ export default {
     Checkout: 'extensions/checkout/checkout.vue'
   },
   organisms: {
+    AccountAddressSelect: 'organisms/account-address-select/account-address-select.vue',
     ShippingAddress: 'organisms/shipping-address/shipping-address.vue',
     PaymentAddress: 'organisms/payment-address/payment-address.vue',
     PaymentMethods: 'organisms/payment-methods/payment-methods.vue',

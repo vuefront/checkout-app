@@ -2,6 +2,7 @@
       <vf-o-form @submit="onSubmit" v-if="!loading" :button="false">
         <vf-m-row>
           <vf-m-col md="4" sm="12">
+            <vf-o-account-address-select ref="accountAddress"/>
             <vf-o-payment-address
               ref="paymentAddress"
               :delivery="response.shippingAddress.length > 0"
@@ -83,6 +84,10 @@ export default {
         }
       }`
     }).then(() => {
+      console.log(this)
+      console.log(this.$refs)
+      console.log(this.$refs.accountAddress)
+      console.log(this.$refs.paymentAddress)
       this.$store.dispatch('apollo/query', {
         query:this.$options.query
       }).then(() => {
