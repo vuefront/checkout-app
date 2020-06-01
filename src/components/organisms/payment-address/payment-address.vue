@@ -95,8 +95,18 @@ export default {
   data () {
     let form = {}
     for (const key in this.address.fields) {
-      form[this.address.fields[key].name] = null
+      form[this.address.fields[key].name] = this.address.fields[key].defaultValue ? this.address.fields[key].defaultValue : null
+
     }
+
+    if(form.country_id) {
+      this.$store.dispatch("store/checkout/paymentAddress/zones", {
+        page: 1,
+        size: -1,
+        country_id: form.country_id
+      });
+    }
+
     return {
       deliveryAddress: true,
       agree: null,

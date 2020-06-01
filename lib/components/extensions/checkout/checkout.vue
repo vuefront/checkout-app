@@ -230,6 +230,7 @@ export default {
       name
       label
       required
+      defaultValue
       values {
         text
         value
@@ -245,6 +246,7 @@ export default {
     name
     label
     required
+    defaultValue
     values {
       text
       value

@@ -16,6 +16,8 @@
   "address1Error":  "Address must be between 3 and 128 characters!",
   "address2": "Address 2",
   "address2Error": "Address must be between 3 and 128 characters!",
+  "address3": "Address 3",
+  "address3Error": "Address must be between 3 and 128 characters!",
   "city": "City",
   "cityError": "City must be between 2 and 128 characters!",
   "postcode": "Post Code",
