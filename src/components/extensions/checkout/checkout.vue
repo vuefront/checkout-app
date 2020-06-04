@@ -1,8 +1,8 @@
 <template>
+  <div class="vf-e-checkout">
       <vf-o-form @submit="onSubmit" v-if="!loading" :button="false">
         <vf-m-row>
           <vf-m-col md="4" sm="12">
-            <vf-o-account-address-select ref="accountAddress"/>
             <vf-o-payment-address
               ref="paymentAddress"
               :delivery="response.shippingAddress.length > 0"
@@ -52,6 +52,7 @@
         </vf-m-row>
       </vf-o-form>
       <vf-a-loader v-else/>
+    </div>
 </template>
 <script>
 import { validationMixin } from "vuelidate";
@@ -65,7 +66,9 @@ export default {
   data() {
     return {
       debounced: debounce(this.updateOrder, 1000),
-      response: {},
+      response: {
+        shippingAddress: []
+      },
       loading: true,
       deliveryAddress: true,
       paymentMethod: '',
@@ -84,16 +87,11 @@ export default {
         }
       }`
     }).then(() => {
-      console.log(this)
-      console.log(this.$refs)
-      console.log(this.$refs.accountAddress)
-      console.log(this.$refs.paymentAddress)
-      this.$store.dispatch('apollo/query', {
-        query:this.$options.query
-      }).then(() => {
-        const response = this.$store.getters['apollo/get']
-        this.$store.commit('store/cart/setCart', response.cart)
-        this.response = response
+      this.$vfapollo.query({
+        query: this.$options.query
+      }).then(({data}) => {
+        this.$store.commit('store/cart/setCart', data.cart)
+        this.response = data
         this.loading = false
       })
     })

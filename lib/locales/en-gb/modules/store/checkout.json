@@ -36,5 +36,6 @@
   "zoneError": "Zone required!",
   "buttonConfirm": "Confirm",
   "deliveryAddress": "My delivery and billing addresses are the same.",
-  "requiredError": "required!"
+  "requiredError": "required!",
+  "text_new_address": "I want to use a new address"
 }
