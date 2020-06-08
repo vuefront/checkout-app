@@ -121,7 +121,13 @@ export default {
   watch: {
     form: {
       handler(value, oldValue) {
-        this.$emit('input', value)
+        this.$emit('input', {addressId: this.selectedAddress, address: value})
+      },
+      deep: true
+    },
+    selectedAddress: {
+      handler(value, oldValue) {
+        this.$emit('input', {addressId: value, address: this.form})
       },
       deep: true
     },
@@ -133,6 +139,14 @@ export default {
   },
   validations() {
     let fields = {};
+
+    if(this.selectedAddress) {
+      return {
+        form: {
+          
+        }
+      }
+    }
 
     for (const key in this.address.fields) {
       fields[this.address.fields[key].name] = {}

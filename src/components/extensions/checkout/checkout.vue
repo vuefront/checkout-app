@@ -74,7 +74,9 @@ export default {
       paymentMethod: '',
       shippingMethod: '',
       paymentAddress: {},
+      paymentAddressId: '',
       shippingAddress: {},
+      shippingAddressId: '',
       updating: false
     }
   },
@@ -142,6 +144,17 @@ export default {
       }
 
       return result
+    },
+    shippingAddressIdData() {
+      let result = null
+
+      if(this.deliveryAddress) {
+        result = this.paymentAddressId
+      } else {
+        result = this.shippingAddressId
+      }
+
+      return result
     }
   },
   methods: {
@@ -153,19 +166,23 @@ export default {
       this.shippingMethod = val
       this.debounced()
     },
-    async updatePaymentAddress(val) {
-      this.paymentAddress = val
-     this.debounced()
+    async updatePaymentAddress({addressId, address}) {
+      this.paymentAddress = address
+      this.paymentAddressId = addressId
+      this.debounced()
     },
-    async updateShippingAddress(val) {
-      this.shippingAddress = val
+    async updateShippingAddress({addressId, address}) {
+      this.shippingAddressId = addressId
+      this.shippingAddress = address
       this.debounced()
     },
     async updateOrder() {
       this.updating = true
       const data = await this.$store.dispatch('store/checkout/order/update', {
         paymentAddress: this.paymentAddressData,
+        paymentAddressId: this.paymentAddressId,
         shippingAddress: this.shippingAddressData,
+        shippingAddressId: this.shippingAddressIdData,
         paymentMethod: this.paymentMethod,
         shippingMethod: this.shippingMethod
       })
@@ -182,7 +199,6 @@ export default {
       if(!this.deliveryAddress) {
         this.$refs.shippingAddress.$v.$touch()
       }
-
 
       if (!this.$refs.paymentAddress.$v.form.$invalid && !this.$refs.shippingMethods.$v.method.$invalid && !this.$refs.paymentMethods.$v.method.$invalid) {
         if(this.deliveryAddress || (!this.deliveryAddress  && !this.$refs.shippingAddress.$v.form.$invalid)) {
