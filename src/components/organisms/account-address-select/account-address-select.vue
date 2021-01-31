@@ -1,20 +1,64 @@
 <template>
-  <div>
-    select
-  </div>
+  <div class="vf-o-account-address-select" v-show="$vuefront.isAuth" >
+    <vf-o-apollo @loaded="handleLoaded">
+      <vf-a-radio-group :options="options" @input="handleInput"></vf-a-radio-group>
+    </vf-o-apollo>
+    </div>
 </template>
 <script>
+import {mapGetters} from 'vuex'
 export default {
-  fragments:{
-    fields:  `
-      {
-        accountAddressList {
-          id
-          firstName
-          lastName
-          address1
-        }
-      }`
+  props: {
+    value: {
+      type: String,
+      default() {
+        return null
+      }
+    }
   },
+  data() {
+    return {
+      addressList: []
+    }
+  },
+  computed: {
+    options() {
+      let result = []
+
+      for (const key in this.addressList) {
+        const value = this.addressList[key]
+        result = [...result, {
+          value: value.id,
+          text: `${value.firstName} ${value.lastName} ${value.address1}`
+        }]
+      }
+
+      result = [...result, {
+        text: this.$t('modules.store.checkout.text_new_address'),
+        value: null
+      }]
+
+      return result;
+    }
+  },
+  methods: {
+    handleLoaded(data) {
+      this.addressList = data.accountAddressList
+    },
+    handleInput(value) {
+      this.$emit('input', value)
+    }
+  }
 }
 </script>
+<graphql>
+{
+	accountAddressList {
+    id
+    firstName
+    lastName
+    address1
+    address2
+  }
+}
+</graphql>

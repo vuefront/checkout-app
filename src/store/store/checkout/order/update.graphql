@@ -1,5 +1,5 @@
-mutation($paymentAddress: [InputField], $shippingAddress: [InputField], $paymentMethod: String, $shippingMethod: String) {
-  updateOrder(paymentAddress: $paymentAddress, shippingAddress: $shippingAddress, paymentMethod: $paymentMethod, shippingMethod: $shippingMethod) {
+mutation($paymentAddress: [InputField], $paymentAddressId: String, $shippingAddressId: String, $shippingAddress: [InputField], $paymentMethod: String, $shippingMethod: String) {
+  updateOrder(paymentAddress: $paymentAddress, shippingAddress: $shippingAddress, shippingAddressId: $shippingAddressId, paymentAddressId: $paymentAddressId, paymentMethod: $paymentMethod, shippingMethod: $shippingMethod) {
     shippingMethods {
       id
       codename

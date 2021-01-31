@@ -1,8 +1,8 @@
 <template>
+  <div class="vf-e-checkout">
       <vf-o-form @submit="onSubmit" v-if="!loading" :button="false">
         <vf-m-row>
           <vf-m-col md="4" sm="12">
-            <vf-o-account-address-select ref="accountAddress"/>
             <vf-o-payment-address
               ref="paymentAddress"
               :delivery="response.shippingAddress.length > 0"
@@ -52,6 +52,7 @@
         </vf-m-row>
       </vf-o-form>
       <vf-a-loader v-else/>
+    </div>
 </template>
 <script>
 import { validationMixin } from "vuelidate";
@@ -67,13 +68,17 @@ export default {
     return {
       mdiArrowRight,
       debounced: debounce(this.updateOrder, 1000),
-      response: {},
+      response: {
+        shippingAddress: []
+      },
       loading: true,
       deliveryAddress: true,
       paymentMethod: '',
       shippingMethod: '',
       paymentAddress: {},
+      paymentAddressId: '',
       shippingAddress: {},
+      shippingAddressId: '',
       updating: false
     }
   },
@@ -86,12 +91,11 @@ export default {
         }
       }`
     }).then(() => {
-      this.$store.dispatch('apollo/query', {
-        query:this.$options.query
-      }).then(() => {
-        const response = this.$store.getters['apollo/get']
-        this.$store.commit('store/cart/setCart', response.cart)
-        this.response = response
+      this.$vfapollo.query({
+        query: this.$options.query
+      }).then(({data}) => {
+        this.$store.commit('store/cart/setCart', data.cart)
+        this.response = data
         this.loading = false
       })
     })
@@ -142,6 +146,17 @@ export default {
       }
 
       return result
+    },
+    shippingAddressIdData() {
+      let result = null
+
+      if(this.deliveryAddress) {
+        result = this.paymentAddressId
+      } else {
+        result = this.shippingAddressId
+      }
+
+      return result
     }
   },
   methods: {
@@ -153,19 +168,23 @@ export default {
       this.shippingMethod = val
       this.debounced()
     },
-    async updatePaymentAddress(val) {
-      this.paymentAddress = val
-     this.debounced()
+    async updatePaymentAddress({addressId, address}) {
+      this.paymentAddress = address
+      this.paymentAddressId = addressId
+      this.debounced()
     },
-    async updateShippingAddress(val) {
-      this.shippingAddress = val
+    async updateShippingAddress({addressId, address}) {
+      this.shippingAddressId = addressId
+      this.shippingAddress = address
       this.debounced()
     },
     async updateOrder() {
       this.updating = true
       const data = await this.$store.dispatch('store/checkout/order/update', {
         paymentAddress: this.paymentAddressData,
+        paymentAddressId: this.paymentAddressId,
         shippingAddress: this.shippingAddressData,
+        shippingAddressId: this.shippingAddressIdData,
         paymentMethod: this.paymentMethod,
         shippingMethod: this.shippingMethod
       })
@@ -183,7 +202,6 @@ export default {
       if(!this.deliveryAddress) {
         this.$refs.shippingAddress.$v.$touch()
       }
-
 
       if (!this.$refs.paymentAddress.$v.form.$invalid && !this.$refs.shippingMethods.$v.method.$invalid && !this.$refs.paymentMethods.$v.method.$invalid) {
         if(this.deliveryAddress || (!this.deliveryAddress  && !this.$refs.shippingAddress.$v.form.$invalid)) {

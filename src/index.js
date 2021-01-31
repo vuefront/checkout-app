@@ -19,8 +19,8 @@ export default {
     CheckoutCart: 'organisms/checkout-cart/checkout-cart.vue'
   },
   locales: {
-    'en-gb': ['en-gb'],
-    'ru-ru': ['ru-ru']
+    'en-gb': ['checkout'],
+    'ru-ru': ['checkout']
   },
   store: [
     {
