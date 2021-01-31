@@ -45,7 +45,7 @@
             <div class="mt-4 text-right">
               <vf-a-button type="submit" color="primary" :disabled="updating">
                 {{$t('modules.store.checkout.buttonConfirm')}}
-                  <vf-a-icon icon="long-arrow-alt-right" size="sm" />
+                  <vf-a-icon :icon="mdiArrowRight" />
               </vf-a-button>
             </div>
           </vf-m-col>
@@ -61,9 +61,11 @@ import required from "vuelidate/lib/validators/required";
 import minLength from "vuelidate/lib/validators/minLength";
 import maxLength from "vuelidate/lib/validators/maxLength";
 import gql from 'graphql-tag'
+import {mdiArrowRight} from '@mdi/js'
 export default {
   data() {
     return {
+      mdiArrowRight,
       debounced: debounce(this.updateOrder, 1000),
       response: {},
       loading: true,
@@ -84,10 +86,6 @@ export default {
         }
       }`
     }).then(() => {
-      console.log(this)
-      console.log(this.$refs)
-      console.log(this.$refs.accountAddress)
-      console.log(this.$refs.paymentAddress)
       this.$store.dispatch('apollo/query', {
         query:this.$options.query
       }).then(() => {
@@ -177,6 +175,7 @@ export default {
       this.updating = false
     },
     async onSubmit() {
+      console.log('onSubmit')
       this.$refs.paymentAddress.$v.$touch()
       this.$refs.paymentMethods.$v.$touch()
       this.$refs.shippingMethods.$v.$touch()
