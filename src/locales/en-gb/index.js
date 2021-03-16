@@ -1,4 +1,2 @@
-import modules from './modules'
-export {
-  modules
-}
+import modules from "./modules";
+export { modules };

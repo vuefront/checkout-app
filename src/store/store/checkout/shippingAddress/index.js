@@ -1,5 +1,3 @@
-import * as ShippingAddress from './shippingAddress'
+import * as ShippingAddress from "./shippingAddress";
 
-export {
-  ShippingAddress
-}
+export { ShippingAddress };

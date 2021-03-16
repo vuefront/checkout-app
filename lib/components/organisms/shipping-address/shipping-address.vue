@@ -3,34 +3,76 @@
     class="vf-e-store-checkout__shipping_address"
     :title="$t('modules.store.checkout.shippingAddressTitle')"
   >
-  <vf-o-account-address-select class="mb-3" v-model="selectedAddress"/>
+    <vf-o-account-address-select v-model="selectedAddress" class="mb-3" />
     <template v-if="!selectedAddress">
       <vf-m-field
         v-for="(value, index) in address"
         :id="`input-shipping-address-${value.name}`"
-        :state="$v.form[value.name].$dirty ? !$v.form[value.name].$error : null"
         :key="index"
+        :state="$v.form[value.name].$dirty ? !$v.form[value.name].$error : null"
       >
         <template #label>
           <span v-if="!value.label">
-            {{$t(`modules.store.checkout.${value.name}`)}}
+            {{ $t(`modules.store.checkout.${value.name}`) }}
           </span>
           <span v-else>
-            {{value.label}}
+            {{ value.label }}
           </span>
         </template>
         <template #default="data">
-          <vf-a-input v-if="value.type === 'text'" v-model="form[value.name]" v-bind="data" trim />
-          <vf-a-input v-if="value.type === 'datetime'" type="datetime-local" v-model="form[value.name]" v-bind="data" trim />
-          <vf-a-textarea v-else-if="value.type === 'textarea'" v-model="form[value.name]" v-bind="data" trim />
-          <vf-a-select v-else-if="value.type === 'select'" v-model="form[value.name]" :options="value.values" v-bind="data" no-select />
-          <vf-a-radio-group v-else-if="value.type === 'radio'" v-model="form[value.name]" :options="value.values" v-bind="data" stacked />
-          <vf-a-checkbox-group v-else-if="value.type === 'checkbox'" v-model="form[value.name]" :options="value.values" v-bind="data" stacked />
-          <vf-a-datepicker v-else-if="value.type === 'date'" v-model="form[value.name]" v-bind="data" />
-          <vf-a-timepicker v-else-if="value.type === 'time'" v-model="form[value.name]" v-bind="data" />
-          <vf-a-select
+          <vf-a-input
+            v-if="value.type === 'text'"
             v-model="form[value.name]"
+            v-bind="data"
+            trim
+          />
+          <vf-a-input
+            v-if="value.type === 'datetime'"
+            v-model="form[value.name]"
+            type="datetime-local"
+            v-bind="data"
+            trim
+          />
+          <vf-a-textarea
+            v-else-if="value.type === 'textarea'"
+            v-model="form[value.name]"
+            v-bind="data"
+            trim
+          />
+          <vf-a-select
+            v-else-if="value.type === 'select'"
+            v-model="form[value.name]"
+            :options="value.values"
+            v-bind="data"
+            no-select
+          />
+          <vf-a-radio-group
+            v-else-if="value.type === 'radio'"
+            v-model="form[value.name]"
+            :options="value.values"
+            v-bind="data"
+            stacked
+          />
+          <vf-a-checkbox-group
+            v-else-if="value.type === 'checkbox'"
+            v-model="form[value.name]"
+            :options="value.values"
+            v-bind="data"
+            stacked
+          />
+          <vf-a-datepicker
+            v-else-if="value.type === 'date'"
+            v-model="form[value.name]"
+            v-bind="data"
+          />
+          <vf-a-timepicker
+            v-else-if="value.type === 'time'"
+            v-model="form[value.name]"
+            v-bind="data"
+          />
+          <vf-a-select
             v-else-if="value.type === 'zone'"
+            v-model="form[value.name]"
             v-bind="data"
             :options="zones.content"
             value-field="id"
@@ -38,8 +80,8 @@
             no-select
           />
           <vf-a-select
-            v-model="form[value.name]"
             v-else-if="value.type === 'country'"
+            v-model="form[value.name]"
             v-bind="data"
             :options="countries.content"
             value-field="id"
@@ -50,12 +92,12 @@
         </template>
         <template #error>
           <span v-if="!value.label">
-            {{$t(`modules.store.checkout.${value.name}Error`)}}
+            {{ $t(`modules.store.checkout.${value.name}Error`) }}
           </span>
           <span v-else>
-            {{value.label}} {{$t(`modules.store.checkout.requiredError`)}}
+            {{ value.label }} {{ $t(`modules.store.checkout.requiredError`) }}
           </span>
-          </template>
+        </template>
       </vf-m-field>
     </template>
   </vf-m-card>
@@ -70,79 +112,81 @@ export default {
   props: {
     address: {
       type: Array,
-      default () {
-        return null
-      }
+      default() {
+        return null;
+      },
     },
     countries: {
       type: Object,
-      default () {
-        return null
-      }
+      default() {
+        return null;
+      },
     },
     zones: {
       type: Object,
-      default () {
-        return null
-      }
-    }
-  },
-  watch: {
-    form: {
-      handler(value, oldValue) {
-        this.$emit('input', {address: value, addressId: this.selectedAddress})
+      default() {
+        return null;
       },
-      deep: true
-    },
-    selectedAddress: {
-      handler(value, oldValue) {
-        this.$emit('input', {address: this.form, addressId: value})
-      },
-      deep: true
     },
   },
-  data () {
-    let form = {}
+  data() {
+    const form = {};
     for (const key in this.address) {
-      form[this.address[key].name] = this.address[key].defaultValue ? this.address[key].defaultValue : null
+      form[this.address[key].name] = this.address[key].defaultValue
+        ? this.address[key].defaultValue
+        : null;
     }
 
-    if(form.country_id) {
+    if (form.country_id) {
       this.$store.dispatch("store/checkout/paymentAddress/zones", {
         page: 1,
         size: -1,
-        country_id: form.country_id
+        country_id: form.country_id,
       });
     }
 
     return {
       form,
-      selectedAddress: null
-    }
+      selectedAddress: null,
+    };
+  },
+  watch: {
+    form: {
+      handler(value, oldValue) {
+        this.$emit("input", {
+          address: value,
+          addressId: this.selectedAddress,
+        });
+      },
+      deep: true,
+    },
+    selectedAddress: {
+      handler(value, oldValue) {
+        this.$emit("input", { address: this.form, addressId: value });
+      },
+      deep: true,
+    },
   },
   validations() {
-    let fields = {};
+    const fields = {};
 
-
-    if(this.selectedAddress) {
+    if (this.selectedAddress) {
       return {
-        form: {
-          
-        }
-      }
+        form: {},
+      };
     }
 
     for (const key in this.address) {
-      fields[this.address[key].name] = {}
-      if(this.address[key].required) {
-        fields[this.address[key].name]['required'] = required
+      fields[this.address[key].name] = {};
+      if (this.address[key].required) {
+        fields[this.address[key].name].required = required;
       }
     }
 
     return {
       form: {
-        ...fields
-      }
+        ...fields,
+      },
     };
   },
   methods: {
@@ -150,9 +194,9 @@ export default {
       await this.$store.dispatch("store/checkout/shippingAddress/zones", {
         page: 1,
         size: -1,
-        country_id: value
+        country_id: value,
       });
     },
-  }
-}
+  },
+};
 </script>

@@ -1,55 +1,64 @@
 <template>
-  <div class="vf-o-account-address-select" v-show="$vuefront.isAuth" >
+  <div v-show="$vuefront.isAuth" class="vf-o-account-address-select">
     <vf-o-apollo @loaded="handleLoaded">
-      <vf-a-radio-group :options="options" @input="handleInput"></vf-a-radio-group>
+      <vf-a-radio-group
+        :options="options"
+        @input="handleInput"
+      ></vf-a-radio-group>
     </vf-o-apollo>
-    </div>
+  </div>
 </template>
 <script>
-import {mapGetters} from 'vuex'
+import { mapGetters } from "vuex";
 export default {
   props: {
     value: {
       type: String,
       default() {
-        return null
-      }
-    }
+        return null;
+      },
+    },
   },
   data() {
     return {
-      addressList: []
-    }
+      addressList: [],
+    };
   },
   computed: {
     options() {
-      let result = []
+      let result = [];
 
       for (const key in this.addressList) {
-        const value = this.addressList[key]
-        result = [...result, {
-          value: value.id,
-          text: `${value.firstName} ${value.lastName} ${value.address1}`
-        }]
+        const value = this.addressList[key];
+        result = [
+          ...result,
+          {
+            value: value.id,
+            text: `${value.firstName} ${value.lastName} ${value.address1}`,
+          },
+        ];
       }
 
-      result = [...result, {
-        text: this.$t('modules.store.checkout.text_new_address'),
-        value: null
-      }]
+      result = [
+        ...result,
+        {
+          text: this.$t("modules.store.checkout.text_new_address"),
+          value: null,
+        },
+      ];
 
       return result;
-    }
+    },
   },
   methods: {
     handleLoaded(data) {
-      this.addressList = data.accountAddressList
+      this.addressList = data.accountAddressList;
     },
     handleInput(value) {
-      this.$emit('input', value)
-    }
-  }
-}
+      this.$emit("input", value);
+    },
+  },
+};
 </script>
 <graphql>
 {

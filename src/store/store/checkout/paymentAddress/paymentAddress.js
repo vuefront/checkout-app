@@ -1,35 +1,34 @@
-import ZonesGql from './list.graphql'
+import ZonesGql from "./list.graphql";
 
 export const state = () => ({
   zones: {
-    content: []
-  }
-})
+    content: [],
+  },
+});
 
 export const getters = {
   zones(state) {
-    return state.zones
-  }
-}
+    return state.zones;
+  },
+};
 
 export const mutations = {
   setZones(state, payload) {
-    state.zones = payload
-  }
-}
+    state.zones = payload;
+  },
+};
 
 export const actions = {
   async zones({ commit }, zoneData) {
     try {
-      const {data} = await this.$vfapollo
-      .query({
+      const { data } = await this.$vfapollo.query({
         query: ZonesGql,
-        variables: zoneData
-      })
-      commit('setZones', data.zonesList)
+        variables: zoneData,
+      });
+      commit("setZones", data.zonesList);
     } catch (e) {
-      console.log(e)
-      commit('vuefront/setResponseError', e, {root: true})
+      console.log(e);
+      commit("vuefront/setResponseError", e, { root: true });
     }
-  }
-}
+  },
+};

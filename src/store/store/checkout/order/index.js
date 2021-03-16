@@ -1,5 +1,3 @@
-import * as Order from './order'
+import * as Order from "./order";
 
-export {
-  Order
-}
+export { Order };

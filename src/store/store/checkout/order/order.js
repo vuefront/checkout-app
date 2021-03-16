@@ -1,69 +1,69 @@
-import CreateGql from './create.graphql'
-import UpdateGql from './update.graphql'
-import ConfirmGql from './confirm.graphql'
+import CreateGql from "./create.graphql";
+import UpdateGql from "./update.graphql";
+import ConfirmGql from "./confirm.graphql";
 export const state = () => ({
   order: {},
-  url: ''
-})
+  url: "",
+});
 
 export const getters = {
   order(state) {
-    return state.order
+    return state.order;
   },
   url(state) {
-    return state.url
-  }
-}
+    return state.url;
+  },
+};
 
 export const mutations = {
   setOrder(state, payload) {
-    state.order = payload
+    state.order = payload;
   },
   setUrl(state, payload) {
-    state.url = payload
-  }
-}
+    state.url = payload;
+  },
+};
 
 export const actions = {
   async create({ commit, dispatch, rootGetters }, payload) {
     await dispatch(
-      'apollo/mutate',
+      "apollo/mutate",
       {
         mutation: CreateGql,
-        variables: payload
+        variables: payload,
       },
       {
-        root: true
+        root: true,
       }
-    )
-    if (!rootGetters['vuefront/error']) {
-      commit('setOrder', rootGetters['apollo/get'].createOrder.order)
-      commit('setUrl', rootGetters['apollo/get'].createOrder.url)
+    );
+    if (!rootGetters["vuefront/error"]) {
+      commit("setOrder", rootGetters["apollo/get"].createOrder.order);
+      commit("setUrl", rootGetters["apollo/get"].createOrder.url);
     }
   },
-  async update({commit}, payload) {
+  async update({ commit }, payload) {
     try {
-      const {data} = await this.$vfapollo.mutate({
+      const { data } = await this.$vfapollo.mutate({
         mutation: UpdateGql,
-        variables: payload
-      })
+        variables: payload,
+      });
 
-      return data
-    } catch(e) {
-      commit('vuefront/setResponseError', e, {root: true})
+      return data;
+    } catch (e) {
+      commit("vuefront/setResponseError", e, { root: true });
     }
   },
-  async confirm({commit}) {
+  async confirm({ commit }) {
     try {
-      const {data} = await this.$vfapollo.mutate({
+      const { data } = await this.$vfapollo.mutate({
         mutation: ConfirmGql,
-        variables: {}
-      })
+        variables: {},
+      });
 
-      commit('setOrder', data.confirmOrder.order)
-      commit('setUrl', data.confirmOrder.url)
-    } catch(e) {
-      commit('vuefront/setResponseError', e, {root: true})
+      commit("setOrder", data.confirmOrder.order);
+      commit("setUrl", data.confirmOrder.url);
+    } catch (e) {
+      commit("vuefront/setResponseError", e, { root: true });
     }
-  }
-}
+  },
+};

@@ -1,5 +1,3 @@
-import * as PaymentAddress from './paymentAddress'
+import * as PaymentAddress from "./paymentAddress";
 
-export {
-  PaymentAddress
-}
+export { PaymentAddress };

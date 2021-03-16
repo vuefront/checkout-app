@@ -17,7 +17,9 @@
     "license": "MIT",
     "scripts": {
         "build": "shx mkdir -p lib && shx rm -r lib && cross-env BUILD_DEV=1 NODE_ENV=esm babel src -D --watch --verbose --out-dir lib && echo {} > lib/.babelrc",
-        "yalc-watch": "nodemon -e vue,js,scss,json -x yalc push"
+        "yalc-watch": "nodemon -e vue,js,scss,json -x yalc push",
+        "watch": "concurrently -k -p \"[{name}]\" -n \"Build,Yalc\" -c \"yellow.bold,cyan.bold\" \"npm run build\" \"npm run yalc-watch\"",
+        "lint": "eslint --fix \"src/**/*.vue\""
     },
     "dependencies": {
         "@babel/standalone": "^7.12.12",
@@ -33,10 +35,20 @@
         "@babel/plugin-transform-runtime": "^7.12.10",
         "@babel/polyfill": "^7.8.3",
         "@babel/preset-env": "^7.12.11",
+        "@nuxtjs/eslint-config": "^6.0.0",
+        "@nuxtjs/eslint-config-typescript": "^6.0.0",
+        "@typescript-eslint/parser": "^4.17.0",
         "babel-plugin-minify-dead-code-elimination": "^0.5.1",
         "babel-plugin-transform-inline-environment-variables": "^0.4.3",
+        "concurrently": "^6.0.0",
         "cross-env": "^7.0.3",
+        "eslint": "^7.21.0",
+        "eslint-config-prettier": "^8.1.0",
+        "eslint-plugin-nuxt": ">=2.0.0",
+        "eslint-plugin-prettier": "^3.3.1",
         "nodemon": "^2.0.6",
-        "shx": "^0.3.3"
+        "prettier": "^2.2.1",
+        "shx": "^0.3.3",
+        "typescript": "^4.2.3"
     }
 }

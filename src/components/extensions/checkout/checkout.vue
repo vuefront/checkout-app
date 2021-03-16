@@ -1,231 +1,248 @@
 <template>
   <div class="vf-e-checkout">
-      <vf-o-form @submit="onSubmit" v-if="!loading" :button="false">
-        <vf-m-row>
-          <vf-m-col md="4" sm="12">
-            <vf-o-payment-address
-              ref="paymentAddress"
-              :delivery="response.shippingAddress.length > 0"
-              :address="response.paymentAddress"
-              :countries="response.countriesList"
-              :zones="paymentZones"
-              class="mb-3"
-              @updateDeliveryAddress="deliveryAddress = $event"
-              @input="updatePaymentAddress"
-            />
-            <vf-o-shipping-address
-              v-if="!deliveryAddress && response.shippingAddress.length > 0"
-              ref="shippingAddress"
-              :address="response.shippingAddress"
-              :countries="response.countriesList"
-              :zones="shippingZones"
-              @input="updateShippingAddress"
-            />
-          </vf-m-col>
-          <vf-m-col md="8" sm="12">
-            <vf-m-row>
-              <vf-m-col md="6" sm="12">
-                <vf-o-payment-methods
-                  ref="paymentMethods"
-                  :methods="response.paymentMethods"
-                  @input="handlePaymentMethod"
-                  class="mb-3"
-                />
-              </vf-m-col>
-              <vf-m-col md="6" sm="12">
-                <vf-o-shipping-methods
-                  ref="shippingMethods"
-                  :methods="response.shippingMethods"
-                  @input="handleShippingMethod"
-                  class="mb-3"
-                />
-              </vf-m-col>
-            </vf-m-row>
-            <vf-o-checkout-cart :cart="cart" :totals="response.totals"/>
-            <div class="mt-4 text-right">
-              <vf-a-button type="submit" color="primary" :disabled="updating">
-                {{$t('modules.store.checkout.buttonConfirm')}}
-                  <vf-a-icon :icon="mdiArrowRight" />
-              </vf-a-button>
-            </div>
-          </vf-m-col>
-        </vf-m-row>
-      </vf-o-form>
-      <vf-a-loader v-else/>
-    </div>
+    <vf-o-form v-if="!loading" :button="false" @submit="onSubmit">
+      <vf-m-row>
+        <vf-m-col md="4" sm="12">
+          <vf-o-payment-address
+            ref="paymentAddress"
+            :delivery="response.shippingAddress.length > 0"
+            :address="response.paymentAddress"
+            :countries="response.countriesList"
+            :zones="paymentZones"
+            class="mb-3"
+            @updateDeliveryAddress="deliveryAddress = $event"
+            @input="updatePaymentAddress"
+          />
+          <vf-o-shipping-address
+            v-if="!deliveryAddress && response.shippingAddress.length > 0"
+            ref="shippingAddress"
+            :address="response.shippingAddress"
+            :countries="response.countriesList"
+            :zones="shippingZones"
+            @input="updateShippingAddress"
+          />
+        </vf-m-col>
+        <vf-m-col md="8" sm="12">
+          <vf-m-row>
+            <vf-m-col md="6" sm="12">
+              <vf-o-payment-methods
+                ref="paymentMethods"
+                :methods="response.paymentMethods"
+                class="mb-3"
+                @input="handlePaymentMethod"
+              />
+            </vf-m-col>
+            <vf-m-col md="6" sm="12">
+              <vf-o-shipping-methods
+                ref="shippingMethods"
+                :methods="response.shippingMethods"
+                class="mb-3"
+                @input="handleShippingMethod"
+              />
+            </vf-m-col>
+          </vf-m-row>
+          <vf-o-checkout-cart :cart="cart" :totals="response.totals" />
+          <div class="mt-4 text-right">
+            <vf-a-button type="submit" color="primary" :disabled="updating">
+              {{ $t("modules.store.checkout.buttonConfirm") }}
+              <vf-a-icon :icon="mdiArrowRight" />
+            </vf-a-button>
+          </div>
+        </vf-m-col>
+      </vf-m-row>
+    </vf-o-form>
+    <vf-a-loader v-else />
+  </div>
 </template>
 <script>
 import { validationMixin } from "vuelidate";
-import {mapGetters} from 'vuex'
-import {find, debounce} from 'lodash'
-import required from "vuelidate/lib/validators/required";
-import minLength from "vuelidate/lib/validators/minLength";
-import maxLength from "vuelidate/lib/validators/maxLength";
-import gql from 'graphql-tag'
-import {mdiArrowRight} from '@mdi/js'
+import { mapGetters } from "vuex";
+import { debounce } from "lodash";
+import gql from "graphql-tag";
+import { mdiArrowRight } from "@mdi/js";
 export default {
+  mixins: [validationMixin],
   data() {
     return {
       mdiArrowRight,
       debounced: debounce(this.updateOrder, 1000),
       response: {
-        shippingAddress: []
+        shippingAddress: [],
       },
       loading: true,
       deliveryAddress: true,
-      paymentMethod: '',
-      shippingMethod: '',
+      paymentMethod: "",
+      shippingMethod: "",
       paymentAddress: {},
-      paymentAddressId: '',
+      paymentAddressId: "",
       shippingAddress: {},
-      shippingAddressId: '',
-      updating: false
-    }
-  },
-  mixins: [validationMixin],
-  mounted() {
-    this.$vfapollo.mutate({
-      mutation: gql`mutation{
-        createOrder {
-          success
-        }
-      }`
-    }).then(() => {
-      this.$vfapollo.query({
-        query: this.$options.query
-      }).then(({data}) => {
-        this.$store.commit('store/cart/setCart', data.cart)
-        this.response = data
-        this.loading = false
-      })
-    })
-  },
-
-  watch: {
-    cart: {
-      handler(val, oldVal) {
-        if(val !== oldVal) {
-          this.debounced()
-        }
-      },
-      deep: true
-    }
+      shippingAddressId: "",
+      updating: false,
+    };
   },
   computed: {
     ...mapGetters({
-      url: 'store/checkout/order/url',
-      error: 'vuefront/error',
-      cart: 'store/cart/get',
-      paymentZones: 'store/checkout/paymentAddress/zones',
-      shippingZones: 'store/checkout/shippingAddress/zones'
+      url: "store/checkout/order/url",
+      error: "vuefront/error",
+      cart: "store/cart/get",
+      paymentZones: "store/checkout/paymentAddress/zones",
+      shippingZones: "store/checkout/shippingAddress/zones",
     }),
     paymentAddressData() {
-      let result = []
+      let result = [];
 
-      for(const key in this.paymentAddress) {
-        result = [...result, {
-          name: key,
-          value: this.paymentAddress[key]
-        }]
+      for (const key in this.paymentAddress) {
+        result = [
+          ...result,
+          {
+            name: key,
+            value: this.paymentAddress[key],
+          },
+        ];
       }
 
-      return result
+      return result;
     },
     shippingAddressData() {
-      let result = []
+      let result = [];
 
-      if(this.deliveryAddress) {
-        result = this.paymentAddressData
+      if (this.deliveryAddress) {
+        result = this.paymentAddressData;
       } else {
-        for(const key in this.shippingAddress) {
-          result = [...result, {
-            name: key,
-            value: this.shippingAddress[key]
-          }]
+        for (const key in this.shippingAddress) {
+          result = [
+            ...result,
+            {
+              name: key,
+              value: this.shippingAddress[key],
+            },
+          ];
         }
       }
 
-      return result
+      return result;
     },
     shippingAddressIdData() {
-      let result = null
+      let result = null;
 
-      if(this.deliveryAddress) {
-        result = this.paymentAddressId
+      if (this.deliveryAddress) {
+        result = this.paymentAddressId;
       } else {
-        result = this.shippingAddressId
+        result = this.shippingAddressId;
       }
 
-      return result
-    }
+      return result;
+    },
   },
+  watch: {
+    cart: {
+      handler(val, oldVal) {
+        if (val !== oldVal) {
+          this.debounced();
+        }
+      },
+      deep: true,
+    },
+  },
+  mounted() {
+    this.$vfapollo
+      .mutate({
+        mutation: gql`
+          mutation {
+            createOrder {
+              success
+            }
+          }
+        `,
+      })
+      .then(() => {
+        this.$vfapollo
+          .query({
+            query: this.$options.query,
+          })
+          .then(({ data }) => {
+            this.$store.commit("store/cart/setCart", data.cart);
+            this.response = data;
+            this.loading = false;
+          });
+      });
+  },
+
   methods: {
-    async handlePaymentMethod(val) {
-      this.paymentMethod = val
-      this.debounced()
+    handlePaymentMethod(val) {
+      this.paymentMethod = val;
+      this.debounced();
     },
-    async handleShippingMethod(val) {
-      this.shippingMethod = val
-      this.debounced()
+    handleShippingMethod(val) {
+      this.shippingMethod = val;
+      this.debounced();
     },
-    async updatePaymentAddress({addressId, address}) {
-      this.paymentAddress = address
-      this.paymentAddressId = addressId
-      this.debounced()
+    updatePaymentAddress({ addressId, address }) {
+      this.paymentAddress = address;
+      this.paymentAddressId = addressId;
+      this.debounced();
     },
-    async updateShippingAddress({addressId, address}) {
-      this.shippingAddressId = addressId
-      this.shippingAddress = address
-      this.debounced()
+    updateShippingAddress({ addressId, address }) {
+      this.shippingAddressId = addressId;
+      this.shippingAddress = address;
+      this.debounced();
     },
     async updateOrder() {
-      this.updating = true
-      const data = await this.$store.dispatch('store/checkout/order/update', {
+      this.updating = true;
+      const data = await this.$store.dispatch("store/checkout/order/update", {
         paymentAddress: this.paymentAddressData,
         paymentAddressId: this.paymentAddressId,
         shippingAddress: this.shippingAddressData,
         shippingAddressId: this.shippingAddressIdData,
         paymentMethod: this.paymentMethod,
-        shippingMethod: this.shippingMethod
-      })
-      if(data) {
-        this.response = {...this.response, ...data.updateOrder}
+        shippingMethod: this.shippingMethod,
+      });
+      if (data) {
+        this.response = { ...this.response, ...data.updateOrder };
       }
-      this.updating = false
+      this.updating = false;
     },
     async onSubmit() {
-      console.log('onSubmit')
-      this.$refs.paymentAddress.$v.$touch()
-      this.$refs.paymentMethods.$v.$touch()
-      this.$refs.shippingMethods.$v.$touch()
+      console.log("onSubmit");
+      this.$refs.paymentAddress.$v.$touch();
+      this.$refs.paymentMethods.$v.$touch();
+      this.$refs.shippingMethods.$v.$touch();
 
-      if(!this.deliveryAddress) {
-        this.$refs.shippingAddress.$v.$touch()
+      if (!this.deliveryAddress) {
+        this.$refs.shippingAddress.$v.$touch();
       }
 
-      if (!this.$refs.paymentAddress.$v.form.$invalid && !this.$refs.shippingMethods.$v.method.$invalid && !this.$refs.paymentMethods.$v.method.$invalid) {
-        if(this.deliveryAddress || (!this.deliveryAddress  && !this.$refs.shippingAddress.$v.form.$invalid)) {
-          this.updating = true
-          await this.$store.dispatch('store/checkout/order/confirm')
-          this.updating = false
+      if (
+        !this.$refs.paymentAddress.$v.form.$invalid &&
+        !this.$refs.shippingMethods.$v.method.$invalid &&
+        !this.$refs.paymentMethods.$v.method.$invalid
+      ) {
+        if (
+          this.deliveryAddress ||
+          (!this.deliveryAddress &&
+            !this.$refs.shippingAddress.$v.form.$invalid)
+        ) {
+          this.updating = true;
+          await this.$store.dispatch("store/checkout/order/confirm");
+          this.updating = false;
 
-          if(!this.error) {
-            window.location.href = this.url
+          if (!this.error) {
+            window.location.href = this.url;
           }
         }
       }
     },
     handleLoaded(response) {
-      if(response.cart.products.length === 0) {
-        this.$router.push('/store/cart')
+      if (response.cart.products.length === 0) {
+        this.$router.push("/store/cart");
       }
-      this.$store.commit('store/cart/setCart', response.cart)
+      this.$store.commit("store/cart/setCart", response.cart);
       this.$nextTick(() => {
-        this.response = {...response}
-      })
-    }
-  }
-}
+        this.response = { ...response };
+      });
+    },
+  },
+};
 </script>
 <graphql>
 {
