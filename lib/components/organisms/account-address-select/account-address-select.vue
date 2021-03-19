@@ -3,6 +3,7 @@
     <vf-o-apollo @loaded="handleLoaded">
       <vf-a-radio-group
         :options="options"
+        stacked
         @input="handleInput"
       ></vf-a-radio-group>
     </vf-o-apollo>
@@ -52,6 +53,8 @@ export default {
   },
   methods: {
     handleLoaded(data) {
+      console.log("handleLoaded");
+      console.log(data);
       this.addressList = data.accountAddressList;
     },
     handleInput(value) {

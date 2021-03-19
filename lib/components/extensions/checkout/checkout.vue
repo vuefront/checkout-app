@@ -57,7 +57,8 @@
 <script>
 import { validationMixin } from "vuelidate";
 import { mapGetters } from "vuex";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
+import isEmpty from "lodash/isEmpty";
 import gql from "graphql-tag";
 import { mdiArrowRight } from "@mdi/js";
 export default {
@@ -225,8 +226,8 @@ export default {
           this.updating = true;
           await this.$store.dispatch("store/checkout/order/confirm");
           this.updating = false;
-
-          if (!this.error) {
+          console.log(this.error);
+          if (isEmpty(this.error)) {
             window.location.href = this.url;
           }
         }
