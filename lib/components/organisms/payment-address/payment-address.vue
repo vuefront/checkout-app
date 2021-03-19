@@ -142,10 +142,14 @@ export default {
   data() {
     const form = {};
     for (const key in this.address.fields) {
+      let defaultValue = null;
+      if (this.address.fields[key].type === "checkbox") {
+        defaultValue = [];
+      }
       form[this.address.fields[key].name] = this.address.fields[key]
         .defaultValue
         ? this.address.fields[key].defaultValue
-        : null;
+        : defaultValue;
     }
 
     if (form.country_id) {

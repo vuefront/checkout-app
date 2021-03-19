@@ -53,8 +53,6 @@ export default {
   },
   methods: {
     handleLoaded(data) {
-      console.log("handleLoaded");
-      console.log(data);
       this.addressList = data.accountAddressList;
     },
     handleInput(value) {

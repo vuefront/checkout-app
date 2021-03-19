@@ -204,7 +204,6 @@ export default {
       this.updating = false;
     },
     async onSubmit() {
-      console.log("onSubmit");
       this.$refs.paymentAddress.$v.$touch();
       this.$refs.paymentMethods.$v.$touch();
       this.$refs.shippingMethods.$v.$touch();
@@ -226,7 +225,7 @@ export default {
           this.updating = true;
           await this.$store.dispatch("store/checkout/order/confirm");
           this.updating = false;
-          console.log(this.error);
+
           if (isEmpty(this.error)) {
             window.location.href = this.url;
           }
