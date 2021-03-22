@@ -1,6 +1,4 @@
-import CreateGql from "./create.graphql";
-import UpdateGql from "./update.graphql";
-import ConfirmGql from "./confirm.graphql";
+import gql from "graphql-tag";
 export const state = () => ({
   order: {},
   url: "",
@@ -29,7 +27,26 @@ export const actions = {
     await dispatch(
       "apollo/mutate",
       {
-        mutation: CreateGql,
+        mutation: gql`
+          mutation(
+            $paymentAddress: [InputField]
+            $shippingAddress: [InputField]
+            $paymentMethod: String
+            $shippingMethod: String
+          ) {
+            createOrder(
+              paymentAddress: $paymentAddress
+              shippingAddress: $shippingAddress
+              paymentMethod: $paymentMethod
+              shippingMethod: $shippingMethod
+            ) {
+              order {
+                id
+              }
+              url
+            }
+          }
+        `,
         variables: payload,
       },
       {
@@ -44,7 +61,35 @@ export const actions = {
   async update({ commit }, payload) {
     try {
       const { data } = await this.$vfapollo.mutate({
-        mutation: UpdateGql,
+        mutation: gql`
+          mutation(
+            $paymentAddress: [InputField]
+            $paymentAddressId: String
+            $shippingAddressId: String
+            $shippingAddress: [InputField]
+            $paymentMethod: String
+            $shippingMethod: String
+          ) {
+            updateOrder(
+              paymentAddress: $paymentAddress
+              shippingAddress: $shippingAddress
+              shippingAddressId: $shippingAddressId
+              paymentAddressId: $paymentAddressId
+              paymentMethod: $paymentMethod
+              shippingMethod: $shippingMethod
+            ) {
+              shippingMethods {
+                id
+                codename
+                name
+              }
+              totals {
+                title
+                text
+              }
+            }
+          }
+        `,
         variables: payload,
       });
 
@@ -56,7 +101,16 @@ export const actions = {
   async confirm({ commit }) {
     try {
       const { data } = await this.$vfapollo.mutate({
-        mutation: ConfirmGql,
+        mutation: gql`
+          mutation {
+            confirmOrder {
+              order {
+                id
+              }
+              url
+            }
+          }
+        `,
         variables: {},
       });
 

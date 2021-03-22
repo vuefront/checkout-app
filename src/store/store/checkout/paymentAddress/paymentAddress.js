@@ -1,4 +1,4 @@
-import ZonesGql from "./list.graphql";
+import gql from "graphql-tag";
 
 export const state = () => ({
   zones: {
@@ -22,12 +22,26 @@ export const actions = {
   async zones({ commit }, zoneData) {
     try {
       const { data } = await this.$vfapollo.query({
-        query: ZonesGql,
+        query: gql`
+          query($page: Int, $size: Int, $country_id: String) {
+            zonesList(page: $page, size: $size, country_id: $country_id) {
+              content {
+                id
+                name
+              }
+              totalPages
+              totalElements
+              first
+              last
+              number
+              numberOfElements
+            }
+          }
+        `,
         variables: zoneData,
       });
       commit("setZones", data.zonesList);
     } catch (e) {
-      console.log(e);
       commit("vuefront/setResponseError", e, { root: true });
     }
   },

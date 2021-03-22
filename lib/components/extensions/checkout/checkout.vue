@@ -97,7 +97,11 @@ export default {
           ...result,
           {
             name: key,
-            value: this.paymentAddress[key],
+            value:
+              typeof this.paymentAddress[key] !== "string" &&
+              this.paymentAddress[key] !== null
+                ? JSON.stringify(this.paymentAddress[key])
+                : this.paymentAddress[key],
           },
         ];
       }
@@ -115,7 +119,11 @@ export default {
             ...result,
             {
               name: key,
-              value: this.shippingAddress[key],
+              value:
+                typeof this.shippingAddress[key] !== "string" &&
+                this.shippingAddress[key] !== null
+                  ? JSON.stringify(this.shippingAddress[key])
+                  : this.shippingAddress[key],
             },
           ];
         }
