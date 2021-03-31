@@ -134,7 +134,7 @@ export default {
     for (const key in this.address) {
       form[this.address[key].name] = this.address[key].defaultValue
         ? this.address[key].defaultValue
-        : "";
+        : null;
     }
 
     if (form.country_id) {

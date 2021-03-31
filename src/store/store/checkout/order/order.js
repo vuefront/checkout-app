@@ -23,41 +23,6 @@ export const mutations = {
 };
 
 export const actions = {
-  async create({ commit, dispatch, rootGetters }, payload) {
-    await dispatch(
-      "apollo/mutate",
-      {
-        mutation: gql`
-          mutation(
-            $paymentAddress: [InputField]
-            $shippingAddress: [InputField]
-            $paymentMethod: String
-            $shippingMethod: String
-          ) {
-            createOrder(
-              paymentAddress: $paymentAddress
-              shippingAddress: $shippingAddress
-              paymentMethod: $paymentMethod
-              shippingMethod: $shippingMethod
-            ) {
-              order {
-                id
-              }
-              url
-            }
-          }
-        `,
-        variables: payload,
-      },
-      {
-        root: true,
-      }
-    );
-    if (!rootGetters["vuefront/error"]) {
-      commit("setOrder", rootGetters["apollo/get"].createOrder.order);
-      commit("setUrl", rootGetters["apollo/get"].createOrder.url);
-    }
-  },
   async update({ commit }, payload) {
     try {
       const { data } = await this.$vfapollo.mutate({

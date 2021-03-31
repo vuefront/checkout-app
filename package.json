@@ -1,6 +1,6 @@
 {
     "name": "@vuefront/checkout-app",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "description": "VueFront app",
     "files": [
         "lib",
@@ -17,36 +17,37 @@
     "license": "MIT",
     "scripts": {
         "build": "shx mkdir -p lib && shx rm -r lib && cross-env BUILD_DEV=1 NODE_ENV=esm babel src -D --watch --verbose --out-dir lib && echo {} > lib/.babelrc",
-        "yalc-watch": "nodemon -e vue,js,scss,json -x yalc push",
+        "yalc-watch": "nodemon --delay 3 -e vue,js,scss,json -x yalc push",
         "watch": "concurrently -k -p \"[{name}]\" -n \"Build,Yalc\" -c \"yellow.bold,cyan.bold\" \"npm run build\" \"npm run yalc-watch\"",
         "lint": "eslint --fix \"src/**/*.vue\""
     },
+    "peerDependencies": {
+        "vuefront": "^0.3.35"
+    },
     "dependencies": {
-        "@babel/standalone": "^7.12.12",
-        "core-js": "^3.8.1",
-        "lodash": "^4.17.20",
+        "lodash": "^4.17.21",
         "vue": "^2.6.12",
-        "vuex": "^3.6.0"
+        "vuex": "^3.6.2"
     },
     "devDependencies": {
-        "@babel/cli": "^7.12.10",
-        "@babel/core": "^7.12.10",
-        "@babel/plugin-transform-modules-commonjs": "^7.12.1",
-        "@babel/plugin-transform-runtime": "^7.12.10",
-        "@babel/polyfill": "^7.8.3",
-        "@babel/preset-env": "^7.12.11",
+        "@babel/cli": "^7.13.14",
+        "@babel/core": "^7.13.14",
+        "@babel/plugin-transform-modules-commonjs": "^7.13.8",
+        "@babel/plugin-transform-runtime": "^7.13.10",
+        "@babel/polyfill": "^7.12.1",
+        "@babel/preset-env": "^7.13.12",
         "@nuxtjs/eslint-config": "^6.0.0",
         "@nuxtjs/eslint-config-typescript": "^6.0.0",
-        "@typescript-eslint/parser": "^4.17.0",
+        "@typescript-eslint/parser": "^4.20.0",
         "babel-plugin-minify-dead-code-elimination": "^0.5.1",
         "babel-plugin-transform-inline-environment-variables": "^0.4.3",
         "concurrently": "^6.0.0",
         "cross-env": "^7.0.3",
-        "eslint": "^7.21.0",
+        "eslint": "^7.23.0",
         "eslint-config-prettier": "^8.1.0",
-        "eslint-plugin-nuxt": ">=2.0.0",
+        "eslint-plugin-nuxt": "^2.0.0",
         "eslint-plugin-prettier": "^3.3.1",
-        "nodemon": "^2.0.6",
+        "nodemon": "^2.0.7",
         "prettier": "^2.2.1",
         "shx": "^0.3.3",
         "typescript": "^4.2.3"

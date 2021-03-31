@@ -5,19 +5,21 @@ module.exports = (api) => {
     presets: [],
     env: {
       es: {
-        plugins: [['@babel/plugin-transform-modules-commonjs', { loose: true }]]
+        plugins: [
+          ["@babel/plugin-transform-modules-commonjs", { loose: true }],
+        ],
       },
       esm: {
-        presets: [['@babel/env', { modules: false }]]
+        presets: [["@babel/env", { modules: false }]],
       },
       test: {
-        presets: [['@babel/env', { targets: { node: 'current' } }]]
-      }
+        presets: [["@babel/env", { targets: { node: "current" } }]],
+      },
     },
     plugins: [
-      'transform-inline-environment-variables',
-      'minify-dead-code-elimination',
-      '@babel/plugin-transform-runtime'
-    ]
-  }
-}
+      "transform-inline-environment-variables",
+      "minify-dead-code-elimination",
+      "@babel/plugin-transform-runtime",
+    ],
+  };
+};
