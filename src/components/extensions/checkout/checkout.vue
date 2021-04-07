@@ -66,7 +66,7 @@ export default {
   data() {
     return {
       mdiArrowRight,
-      debounced: debounce(this.updateOrder, 1000),
+      debounced: () => {},
       response: {
         shippingAddress: [],
       },
@@ -154,30 +154,23 @@ export default {
     },
   },
   mounted() {
-    this.$vfapollo
-      .mutate({
-        mutation: gql`
-          mutation {
-            createOrder {
-              success
-            }
-          }
-        `,
-      })
-      .then(() => {
-        this.$vfapollo
-          .query({
-            query: this.$options.query,
-          })
-          .then(({ data }) => {
-            this.$store.commit("store/cart/setCart", data.cart);
-            this.response = data;
-            this.loading = false;
-          });
-      });
+    this.handleLoad().then(() => {
+      setTimeout(() => {
+        this.debounced = debounce(this.updateOrder, 1000);
+      }, 1000);
+    });
   },
 
   methods: {
+    async handleLoad() {
+      await this.$store.dispatch("store/checkout/order/create");
+      const { data } = await this.$vfapollo.query({
+        query: this.$options.query,
+      });
+      this.$store.commit("store/cart/setCart", data.cart);
+      this.response = data;
+      this.loading = false;
+    },
     handlePaymentMethod(val) {
       this.paymentMethod = val;
       this.debounced();

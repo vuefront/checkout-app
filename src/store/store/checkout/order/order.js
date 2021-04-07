@@ -23,6 +23,21 @@ export const mutations = {
 };
 
 export const actions = {
+  async create({ commit }) {
+    try {
+      await this.$vfapollo.mutate({
+        mutation: gql`
+          mutation {
+            createOrder {
+              success
+            }
+          }
+        `,
+      });
+    } catch (e) {
+      commit("vuefront/setResponseError", e, { root: true });
+    }
+  },
   async update({ commit }, payload) {
     try {
       const { data } = await this.$vfapollo.mutate({

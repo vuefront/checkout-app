@@ -3,8 +3,12 @@
     class="vf-e-store-checkout__payment_address"
     :title="$t('modules.store.checkout.paymentAddressTitle')"
   >
-    <vf-o-account-address-select v-model="selectedAddress" class="mb-3" />
-    <template v-if="!selectedAddress">
+    <vf-o-account-address-select
+      v-if="!hideSelectAddress"
+      v-model="selectedAddress"
+      class="mb-3"
+    />
+    <template v-if="!selectedAddress || hideSelectAddress">
       <vf-m-field
         v-for="(value, index) in address.fields"
         :id="`input-payment-address-${value.name}`"
@@ -108,12 +112,23 @@
 </template>
 <script>
 import { validationMixin } from "vuelidate";
+import find from "lodash/find";
 import required from "vuelidate/lib/validators/required";
-import minLength from "vuelidate/lib/validators/minLength";
-import maxLength from "vuelidate/lib/validators/maxLength";
 export default {
   mixins: [validationMixin],
   props: {
+    value: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+    hideSelectAddress: {
+      type: Boolean,
+      default() {
+        return false;
+      },
+    },
     address: {
       type: Object,
       default() {
@@ -146,10 +161,25 @@ export default {
       if (this.address.fields[key].type === "checkbox") {
         defaultValue = [];
       }
-      form[this.address.fields[key].name] = this.address.fields[key]
-        .defaultValue
-        ? this.address.fields[key].defaultValue
-        : defaultValue;
+      if (this.address.fields[key].defaultValue) {
+        defaultValue = this.address.fields[key].defaultValue;
+      }
+      const fieldValue = find(this.value, {
+        name: this.address.fields[key].name,
+      });
+
+      if (fieldValue) {
+        try {
+          defaultValue = JSON.parse(fieldValue.value);
+          if (typeof defaultValue === "number") {
+            defaultValue = fieldValue.value;
+          }
+        } catch (e) {
+          defaultValue = fieldValue.value;
+        }
+      }
+
+      form[this.address.fields[key].name] = defaultValue;
     }
 
     if (form.country_id) {

@@ -3,8 +3,12 @@
     class="vf-e-store-checkout__shipping_address"
     :title="$t('modules.store.checkout.shippingAddressTitle')"
   >
-    <vf-o-account-address-select v-model="selectedAddress" class="mb-3" />
-    <template v-if="!selectedAddress">
+    <vf-o-account-address-select
+      v-if="!hideSelectAddress"
+      v-model="selectedAddress"
+      class="mb-3"
+    />
+    <template v-if="!selectedAddress || hideSelectAddress">
       <vf-m-field
         v-for="(value, index) in address"
         :id="`input-shipping-address-${value.name}`"
@@ -110,6 +114,18 @@ import maxLength from "vuelidate/lib/validators/maxLength";
 export default {
   mixins: [validationMixin],
   props: {
+    value: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+    hideSelectAddress: {
+      type: Boolean,
+      default() {
+        return false;
+      },
+    },
     address: {
       type: Array,
       default() {
@@ -132,9 +148,29 @@ export default {
   data() {
     const form = {};
     for (const key in this.address) {
-      form[this.address[key].name] = this.address[key].defaultValue
-        ? this.address[key].defaultValue
-        : null;
+      let defaultValue = null;
+      if (this.address.fields[key].type === "checkbox") {
+        defaultValue = [];
+      }
+      if (this.address.fields[key].defaultValue) {
+        defaultValue = this.address.fields[key].defaultValue;
+      }
+      const fieldValue = find(this.value, {
+        name: this.address.fields[key].name,
+      });
+
+      if (fieldValue) {
+        try {
+          defaultValue = JSON.parse(fieldValue.value);
+          if (typeof defaultValue === "number") {
+            defaultValue = fieldValue.value;
+          }
+        } catch (e) {
+          defaultValue = fieldValue.value;
+        }
+      }
+
+      form[this.address.fields[key].name] = defaultValue;
     }
 
     if (form.country_id) {
