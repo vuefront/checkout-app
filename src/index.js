@@ -19,6 +19,10 @@ export default {
     PaymentMethods: "organisms/payment-methods/payment-methods.vue",
     ShippingMethods: "organisms/shipping-methods/shipping-methods.vue",
     CheckoutCart: "organisms/checkout-cart/checkout-cart.vue",
+    CheckoutCartProduct: {
+      css: "organisms/checkout-cart-product/checkout-cart-product.scss",
+      component: "organisms/checkout-cart-product/checkout-cart-product.vue",
+    },
   },
   locales: {
     "en-gb": ["en-gb"],

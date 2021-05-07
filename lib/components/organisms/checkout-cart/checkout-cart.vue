@@ -3,26 +3,12 @@
     class="vf-e-store-checkout__cart"
     :title="$t('modules.store.checkout.cartTitle')"
   >
-    <div
-      v-for="item in cart.products"
-      :key="item.key"
-      class="vf-e-store-checkout__cart__products"
-    >
-      <div class="vf-e-store-checkout__cart__products_thumb">
-        <vf-m-product-thumb-inline
-          :product="item.product"
-          :option="item.option"
-        />
-      </div>
-      <div class="vf-e-store-checkout__cart__products_quantity">
-        <vf-o-cart-quantity :cart-product="item" />
-      </div>
-      <div class="vf-e-store-checkout__cart__products_price">
-        {{ item.total }}
-      </div>
-      <div class="vf-e-store-checkout__cart__products_actions">
-        <vf-o-cart-actions :cart-product="item" />
-      </div>
+    <div class="vf-e-store-checkout__cart__products">
+      <vf-o-checkout-cart-product
+        v-for="item in cart.products"
+        :key="item.key"
+        :product="item"
+      />
     </div>
     <div class="vf-e-store-checkout__cart__totals">
       <vf-m-row
