@@ -309,6 +309,11 @@ export default {
               price
               image
               imageLazy
+              manufacturer {
+                id
+                name
+                url(url: "/store/manufacturer/_id")
+              }
           }
       }
       total
