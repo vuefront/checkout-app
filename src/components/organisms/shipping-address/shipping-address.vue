@@ -137,7 +137,7 @@ export default {
       },
     },
     address: {
-      type: Object,
+      type: Array,
       default() {
         return null;
       },
