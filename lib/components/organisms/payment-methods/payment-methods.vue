@@ -20,6 +20,12 @@ import required from "vuelidate/lib/validators/required";
 export default {
   mixins: [validationMixin],
   props: {
+    autoSelect: {
+      type: Boolean,
+      default() {
+        return false;
+      },
+    },
     methods: {
       type: Array,
       default() {
@@ -36,6 +42,11 @@ export default {
     method(value) {
       this.$emit("input", value);
     },
+  },
+  mounted() {
+    if (this.autoSelect && this.methods.length > 0) {
+      this.method = this.methods[0].codename;
+    }
   },
   validations() {
     return {

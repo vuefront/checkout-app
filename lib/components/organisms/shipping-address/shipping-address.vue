@@ -9,108 +9,112 @@
       class="mb-3"
     />
     <template v-if="!selectedAddress || hideSelectAddress">
-      <vf-m-field
-        v-for="(value, index) in address"
-        :id="`input-shipping-address-${value.name}`"
-        :key="index"
-        :state="$v.form[value.name].$dirty ? !$v.form[value.name].$error : null"
-      >
-        <template #label>
-          <span v-if="!value.label">
-            {{ $t(`modules.store.checkout.${value.name}`) }}
-          </span>
-          <span v-else>
-            {{ value.label }}
-          </span>
-        </template>
-        <template #default="data">
-          <vf-a-input
-            v-if="value.type === 'text'"
-            v-model="form[value.name]"
-            v-bind="data"
-            trim
-          />
-          <vf-a-input
-            v-if="value.type === 'datetime'"
-            v-model="form[value.name]"
-            type="datetime-local"
-            v-bind="data"
-            trim
-          />
-          <vf-a-textarea
-            v-else-if="value.type === 'textarea'"
-            v-model="form[value.name]"
-            v-bind="data"
-            trim
-          />
-          <vf-a-select
-            v-else-if="value.type === 'select'"
-            v-model="form[value.name]"
-            :options="value.values"
-            v-bind="data"
-            no-select
-          />
-          <vf-a-radio-group
-            v-else-if="value.type === 'radio'"
-            v-model="form[value.name]"
-            :options="value.values"
-            v-bind="data"
-            stacked
-          />
-          <vf-a-checkbox-group
-            v-else-if="value.type === 'checkbox'"
-            v-model="form[value.name]"
-            :options="value.values"
-            v-bind="data"
-            stacked
-          />
-          <vf-a-datepicker
-            v-else-if="value.type === 'date'"
-            v-model="form[value.name]"
-            v-bind="data"
-          />
-          <vf-a-timepicker
-            v-else-if="value.type === 'time'"
-            v-model="form[value.name]"
-            v-bind="data"
-          />
-          <vf-a-select
-            v-else-if="value.type === 'zone'"
-            v-model="form[value.name]"
-            v-bind="data"
-            :options="zones.content"
-            value-field="id"
-            text-field="name"
-            no-select
-          />
-          <vf-a-select
-            v-else-if="value.type === 'country'"
-            v-model="form[value.name]"
-            v-bind="data"
-            :options="countries.content"
-            value-field="id"
-            text-field="name"
-            no-select
-            @input="handleChangeCountry"
-          />
-        </template>
-        <template #error>
-          <span v-if="!value.label">
-            {{ $t(`modules.store.checkout.${value.name}Error`) }}
-          </span>
-          <span v-else>
-            {{ value.label }} {{ $t(`modules.store.checkout.requiredError`) }}
-          </span>
-        </template>
-      </vf-m-field>
+      <vf-m-row v-for="(row, rowKey) in getFields" :key="`row_${rowKey}`">
+        <vf-m-col v-for="(value, index) in row" :key="`col_${rowKey}_${index}`">
+          <vf-m-field
+            :id="`input-shipping-address-${value.name}`"
+            :state="
+              $v.form[value.name].$dirty ? !$v.form[value.name].$error : null
+            "
+          >
+            <template #label>
+              <span v-if="!value.label">
+                {{ $t(`modules.store.checkout.${value.name}`) }}
+              </span>
+              <span v-else>
+                {{ value.label }}
+              </span>
+            </template>
+            <template #default="data">
+              <vf-a-input
+                v-if="value.type === 'text'"
+                v-model="form[value.name]"
+                v-bind="data"
+                trim
+              />
+              <vf-a-input
+                v-if="value.type === 'datetime'"
+                v-model="form[value.name]"
+                type="datetime-local"
+                v-bind="data"
+                trim
+              />
+              <vf-a-textarea
+                v-else-if="value.type === 'textarea'"
+                v-model="form[value.name]"
+                v-bind="data"
+                trim
+              />
+              <vf-a-select
+                v-else-if="value.type === 'select'"
+                v-model="form[value.name]"
+                :options="value.values"
+                v-bind="data"
+                no-select
+              />
+              <vf-a-radio-group
+                v-else-if="value.type === 'radio'"
+                v-model="form[value.name]"
+                :options="value.values"
+                v-bind="data"
+                stacked
+              />
+              <vf-a-checkbox-group
+                v-else-if="value.type === 'checkbox'"
+                v-model="form[value.name]"
+                :options="value.values"
+                v-bind="data"
+                stacked
+              />
+              <vf-a-datepicker
+                v-else-if="value.type === 'date'"
+                v-model="form[value.name]"
+                v-bind="data"
+              />
+              <vf-a-timepicker
+                v-else-if="value.type === 'time'"
+                v-model="form[value.name]"
+                v-bind="data"
+              />
+              <vf-a-select
+                v-else-if="value.type === 'zone'"
+                v-model="form[value.name]"
+                v-bind="data"
+                :options="zones.content"
+                value-field="id"
+                text-field="name"
+                no-select
+              />
+              <vf-a-select
+                v-else-if="value.type === 'country'"
+                v-model="form[value.name]"
+                v-bind="data"
+                :options="countries.content"
+                value-field="id"
+                text-field="name"
+                no-select
+                @input="handleChangeCountry"
+              />
+            </template>
+            <template #error>
+              <span v-if="!value.label">
+                {{ $t(`modules.store.checkout.${value.name}Error`) }}
+              </span>
+              <span v-else>
+                {{ value.label }}
+                {{ $t(`modules.store.checkout.requiredError`) }}
+              </span>
+            </template>
+          </vf-m-field>
+        </vf-m-col>
+      </vf-m-row>
     </template>
   </vf-m-card>
 </template>
 <script>
 import { validationMixin } from "vuelidate";
+import find from "lodash/find";
 import required from "vuelidate/lib/validators/required";
-import minLength from "vuelidate/lib/validators/minLength";
-import maxLength from "vuelidate/lib/validators/maxLength";
 export default {
   mixins: [validationMixin],
   props: {
@@ -120,6 +124,12 @@ export default {
         return [];
       },
     },
+    schema: {
+      type: Array,
+      default() {
+        return [1];
+      },
+    },
     hideSelectAddress: {
       type: Boolean,
       default() {
@@ -127,7 +137,7 @@ export default {
       },
     },
     address: {
-      type: Array,
+      type: Object,
       default() {
         return null;
       },
@@ -186,12 +196,44 @@ export default {
       selectedAddress: null,
     };
   },
+  computed: {
+    getFields() {
+      const result = [];
+      let r = 0;
+      const c = 0;
+      let countItems = 1;
+      let row = [];
+
+      if (r < this.schema.length) {
+        countItems = this.schema[r];
+      } else if (this.schema.length > 0) {
+        countItems = this.schema[this.schema.length - 1];
+      }
+
+      for (const key in this.address) {
+        if (row.length === countItems) {
+          result.push(row);
+          row = [];
+          r++;
+          if (r < this.schema.length) {
+            countItems = this.schema[r];
+          } else if (this.schema.length > 0) {
+            countItems = this.schema[this.schema.length - 1];
+          }
+        }
+
+        row.push(this.address[key]);
+      }
+
+      return result;
+    },
+  },
   watch: {
     form: {
       handler(value, oldValue) {
         this.$emit("input", {
-          address: value,
           addressId: this.selectedAddress,
+          address: value,
         });
       },
       deep: true,

@@ -9,97 +9,101 @@
       class="mb-3"
     />
     <template v-if="!selectedAddress || hideSelectAddress">
-      <vf-m-field
-        v-for="(value, index) in address.fields"
-        :id="`input-payment-address-${value.name}`"
-        :key="index"
-        :state="$v.form[value.name].$dirty ? !$v.form[value.name].$error : null"
-      >
-        <template #label>
-          <span v-if="!value.label">
-            {{ $t(`modules.store.checkout.${value.name}`) }}
-          </span>
-          <span v-else>
-            {{ value.label }}
-          </span>
-        </template>
-        <template #default="data">
-          <vf-a-input
-            v-if="value.type === 'text'"
-            v-model="form[value.name]"
-            v-bind="data"
-            trim
-          />
-          <vf-a-input
-            v-if="value.type === 'datetime'"
-            v-model="form[value.name]"
-            type="datetime-local"
-            v-bind="data"
-            trim
-          />
-          <vf-a-textarea
-            v-else-if="value.type === 'textarea'"
-            v-model="form[value.name]"
-            v-bind="data"
-            trim
-          />
-          <vf-a-select
-            v-else-if="value.type === 'select'"
-            v-model="form[value.name]"
-            :options="value.values"
-            v-bind="data"
-            no-select
-          />
-          <vf-a-radio-group
-            v-else-if="value.type === 'radio'"
-            v-model="form[value.name]"
-            :options="value.values"
-            v-bind="data"
-            stacked
-          />
-          <vf-a-checkbox-group
-            v-else-if="value.type === 'checkbox'"
-            v-model="form[value.name]"
-            :options="value.values"
-            v-bind="data"
-            stacked
-          />
-          <vf-a-datepicker
-            v-else-if="value.type === 'date'"
-            v-model="form[value.name]"
-            v-bind="data"
-          />
-          <vf-a-timepicker
-            v-else-if="value.type === 'time'"
-            v-model="form[value.name]"
-            v-bind="data"
-          />
-          <vf-a-select
-            v-else-if="value.type === 'zone'"
-            v-model="form[value.name]"
-            v-bind="data"
-            :options="zones.content"
-            value-field="id"
-            text-field="name"
-            no-select
-          />
-          <vf-a-select
-            v-else-if="value.type === 'country'"
-            v-model="form[value.name]"
-            v-bind="data"
-            :options="countries.content"
-            value-field="id"
-            text-field="name"
-            no-select
-            @input="handleChangeCountry"
-          />
-        </template>
-        <template #error>{{
-          $te(`modules.store.checkout.${value.name}Error`)
-            ? $t(`modules.store.checkout.${value.name}Error`)
-            : value.name
-        }}</template>
-      </vf-m-field>
+      <vf-m-row v-for="(row, rowKey) in getFields" :key="`row_${rowKey}`">
+        <vf-m-col v-for="(value, index) in row" :key="`col_${rowKey}_${index}`">
+          <vf-m-field
+            :id="`input-payment-address-${value.name}`"
+            :state="
+              $v.form[value.name].$dirty ? !$v.form[value.name].$error : null
+            "
+          >
+            <template #label>
+              <span v-if="!value.label">
+                {{ $t(`modules.store.checkout.${value.name}`) }}
+              </span>
+              <span v-else>
+                {{ value.label }}
+              </span>
+            </template>
+            <template #default="data">
+              <vf-a-input
+                v-if="value.type === 'text'"
+                v-model="form[value.name]"
+                v-bind="data"
+                trim
+              />
+              <vf-a-input
+                v-if="value.type === 'datetime'"
+                v-model="form[value.name]"
+                type="datetime-local"
+                v-bind="data"
+                trim
+              />
+              <vf-a-textarea
+                v-else-if="value.type === 'textarea'"
+                v-model="form[value.name]"
+                v-bind="data"
+                trim
+              />
+              <vf-a-select
+                v-else-if="value.type === 'select'"
+                v-model="form[value.name]"
+                :options="value.values"
+                v-bind="data"
+                no-select
+              />
+              <vf-a-radio-group
+                v-else-if="value.type === 'radio'"
+                v-model="form[value.name]"
+                :options="value.values"
+                v-bind="data"
+                stacked
+              />
+              <vf-a-checkbox-group
+                v-else-if="value.type === 'checkbox'"
+                v-model="form[value.name]"
+                :options="value.values"
+                v-bind="data"
+                stacked
+              />
+              <vf-a-datepicker
+                v-else-if="value.type === 'date'"
+                v-model="form[value.name]"
+                v-bind="data"
+              />
+              <vf-a-timepicker
+                v-else-if="value.type === 'time'"
+                v-model="form[value.name]"
+                v-bind="data"
+              />
+              <vf-a-select
+                v-else-if="value.type === 'zone'"
+                v-model="form[value.name]"
+                v-bind="data"
+                :options="zones.content"
+                value-field="id"
+                text-field="name"
+                no-select
+              />
+              <vf-a-select
+                v-else-if="value.type === 'country'"
+                v-model="form[value.name]"
+                v-bind="data"
+                :options="countries.content"
+                value-field="id"
+                text-field="name"
+                no-select
+                @input="handleChangeCountry"
+              />
+            </template>
+            <template #error>{{
+              $te(`modules.store.checkout.${value.name}Error`)
+                ? $t(`modules.store.checkout.${value.name}Error`)
+                : value.name
+            }}</template>
+          </vf-m-field>
+        </vf-m-col>
+      </vf-m-row>
     </template>
     <vf-a-checkbox v-if="delivery" v-model="deliveryAddress">
       {{ $t(`modules.store.checkout.deliveryAddress`) }}
@@ -121,6 +125,12 @@ export default {
       type: Array,
       default() {
         return [];
+      },
+    },
+    schema: {
+      type: Array,
+      default() {
+        return [1];
       },
     },
     hideSelectAddress: {
@@ -196,6 +206,38 @@ export default {
       agree: null,
       form,
     };
+  },
+  computed: {
+    getFields() {
+      const result = [];
+      let r = 0;
+      const c = 0;
+      let countItems = 1;
+      let row = [];
+
+      if (r < this.schema.length) {
+        countItems = this.schema[r];
+      } else if (this.schema.length > 0) {
+        countItems = this.schema[this.schema.length - 1];
+      }
+
+      for (const key in this.address.fields) {
+        if (row.length === countItems) {
+          result.push(row);
+          row = [];
+          r++;
+          if (r < this.schema.length) {
+            countItems = this.schema[r];
+          } else if (this.schema.length > 0) {
+            countItems = this.schema[this.schema.length - 1];
+          }
+        }
+
+        row.push(this.address.fields[key]);
+      }
+
+      return result;
+    },
   },
   watch: {
     form: {
