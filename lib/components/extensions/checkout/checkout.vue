@@ -2,7 +2,7 @@
   <div class="vf-e-checkout">
     <vf-o-form v-if="!loading" :button="false" @submit="onSubmit">
       <vf-m-row>
-        <vf-m-col md="4" sm="12">
+        <vf-m-col md="4" xs="12">
           <vf-o-payment-address
             ref="paymentAddress"
             :delivery="response.shippingAddress.length > 0"
@@ -22,9 +22,9 @@
             @input="updateShippingAddress"
           />
         </vf-m-col>
-        <vf-m-col md="8" sm="12">
+        <vf-m-col md="8" xs="12">
           <vf-m-row>
-            <vf-m-col md="6" sm="12">
+            <vf-m-col md="6" xs="12">
               <vf-o-payment-methods
                 ref="paymentMethods"
                 :methods="response.paymentMethods"
@@ -32,7 +32,7 @@
                 @input="handlePaymentMethod"
               />
             </vf-m-col>
-            <vf-m-col md="6" sm="12">
+            <vf-m-col md="6" xs="12">
               <vf-o-shipping-methods
                 ref="shippingMethods"
                 :methods="response.shippingMethods"

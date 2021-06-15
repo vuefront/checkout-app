@@ -16,10 +16,10 @@
         :key="key"
         class="vf-e-store-checkout__cart__total"
       >
-        <vf-m-col sm="9" md="6" class="text-right">
+        <vf-m-col xs="9" md="6" class="text-right">
           {{ value.title }}
         </vf-m-col>
-        <vf-m-col sm="3" md="6" class="text-right">
+        <vf-m-col xs="3" md="6" class="text-right">
           {{ value.text }}
         </vf-m-col>
       </vf-m-row>
