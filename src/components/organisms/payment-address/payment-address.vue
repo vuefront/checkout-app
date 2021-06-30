@@ -10,7 +10,12 @@
     />
     <template v-if="!selectedAddress || hideSelectAddress">
       <vf-m-row v-for="(row, rowKey) in getFields" :key="`row_${rowKey}`">
-        <vf-m-col v-for="(value, index) in row" :key="`col_${rowKey}_${index}`" xs="12" :md="12/row.length">
+        <vf-m-col
+          v-for="(value, index) in row"
+          :key="`col_${rowKey}_${index}`"
+          xs="12"
+          :md="12 / row.length"
+        >
           <vf-m-field
             :id="`input-payment-address-${value.name}`"
             :state="
@@ -234,6 +239,10 @@ export default {
         }
 
         row.push(this.address.fields[key]);
+      }
+
+      if (row.length > 0) {
+        result.push(row);
       }
 
       return result;
