@@ -196,7 +196,6 @@ export default {
 
       form[this.address.fields[key].name] = defaultValue;
     }
-
     if (form.country_id) {
       this.$store.dispatch("store/checkout/paymentAddress/zones", {
         page: 1,

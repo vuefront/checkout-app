@@ -191,7 +191,7 @@ export default {
     }
 
     if (form.country_id) {
-      this.$store.dispatch("store/checkout/paymentAddress/zones", {
+      this.$store.dispatch("store/checkout/shippingAddress/zones", {
         page: 1,
         size: -1,
         country_id: form.country_id,
