@@ -269,6 +269,12 @@ export default {
       }
     },
   },
+  mounted() {
+    this.$emit("input", {
+      addressId: this.selectedAddress,
+      address: this.form,
+    });
+  },
   validations() {
     const fields = {};
 

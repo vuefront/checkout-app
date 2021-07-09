@@ -42,7 +42,7 @@ export const actions = {
     try {
       const { data } = await this.$vfapollo.mutate({
         mutation: gql`
-          mutation(
+          mutation (
             $paymentAddress: [InputField]
             $paymentAddressId: String
             $shippingAddressId: String
