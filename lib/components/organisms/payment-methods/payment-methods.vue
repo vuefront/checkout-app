@@ -3,13 +3,13 @@
     class="vf-o-payment-methods"
     :title="$t('modules.store.checkout.paymentMethodsTitle')"
   >
-    <div v-for="value in methods" :key="value.id">
+    <div v-for="item in methods" :key="item.id">
       <vf-a-radio
         v-model="method"
         name="payment-method"
-        :value="value.codename"
+        :value="item.codename"
         :state="$v.method.$dirty ? !$v.method.$error : null"
-        >{{ value.name }}</vf-a-radio
+        >{{ item.name }}</vf-a-radio
       >
     </div>
   </vf-m-card>
@@ -20,6 +20,12 @@ import required from "vuelidate/lib/validators/required";
 export default {
   mixins: [validationMixin],
   props: {
+    value: {
+      type: String,
+      default() {
+        return null;
+      },
+    },
     autoSelect: {
       type: Boolean,
       default() {
@@ -35,7 +41,7 @@ export default {
   },
   data() {
     return {
-      method: null,
+      method: this.value,
     };
   },
   watch: {
