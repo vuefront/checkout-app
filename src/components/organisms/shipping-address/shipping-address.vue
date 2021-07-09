@@ -162,16 +162,18 @@ export default {
   },
   data() {
     const form = {};
-    for (const key in this.address.fields) {
+
+    for (const key in this.address) {
       let defaultValue = null;
-      if (this.address.fields[key].type === "checkbox") {
+      if (this.address[key].type === "checkbox") {
         defaultValue = [];
       }
-      if (this.address.fields[key].defaultValue) {
-        defaultValue = this.address.fields[key].defaultValue;
+      if (this.address[key].defaultValue) {
+        defaultValue = this.address[key].defaultValue;
       }
+
       const fieldValue = find(this.value, {
-        name: this.address.fields[key].name,
+        name: this.address[key].name,
       });
 
       if (fieldValue) {
@@ -185,7 +187,7 @@ export default {
         }
       }
 
-      form[this.address.fields[key].name] = defaultValue;
+      form[this.address[key].name] = defaultValue;
     }
 
     if (form.country_id) {
