@@ -51,7 +51,9 @@ export default {
   },
   mounted() {
     if (this.autoSelect && this.methods.length > 0) {
-      this.method = this.methods[0].codename;
+      if (!this.value) {
+        this.method = this.methods[0].codename;
+      }
     }
   },
   validations() {
