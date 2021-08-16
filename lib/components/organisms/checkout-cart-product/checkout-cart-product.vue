@@ -24,7 +24,7 @@
           product.product.model
         }}</span>
         <span
-          v-for="(value, index) in option"
+          v-for="(value, index) in product.option"
           :key="index"
           class="vf-m-product-thumb-inline__option"
         >
