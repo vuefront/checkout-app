@@ -15,13 +15,13 @@
       </vf-m-media-aside>
       <vf-m-media-body class="vf-m-product-thumb-inline__content">
         <div class="vf-m-product-thumb-inline__name">
-          <span>{{ product.name }}</span>
+          <span>{{ product.product.name }}</span>
         </div>
         <div class="vf-o-checkout-cart-product__price">
-          {{ item.total }}
+          {{ product.total }}
         </div>
         <span class="vf-m-product-thumb-inline__model">{{
-          product.model
+          product.product.model
         }}</span>
         <span
           v-for="(value, index) in option"
@@ -35,12 +35,6 @@
         </span>
       </vf-m-media-body>
     </vf-m-media>
-    <div class="vf-o-checkout-cart-product__thumb">
-      <vf-m-product-thumb-inline
-        :product="product.product"
-        :option="product.option"
-      />
-    </div>
     <div class="vf-o-checkout-cart-product__quantity">
       <vf-o-cart-quantity :cart-product="product" />
     </div>

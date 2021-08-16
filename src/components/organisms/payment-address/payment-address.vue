@@ -11,63 +11,63 @@
     <template v-if="!selectedAddress || hideSelectAddress">
       <vf-m-row v-for="(row, rowKey) in getFields" :key="`row_${rowKey}`">
         <vf-m-col
-          v-for="(value, index) in row"
+          v-for="(field, index) in row"
           :key="`col_${rowKey}_${index}`"
           xs="12"
           :md="12 / row.length"
         >
           <vf-m-field
-            :id="`input-payment-address-${value.name}`"
+            :id="`input-payment-address-${field.name}`"
             :state="
-              $v.form[value.name].$dirty ? !$v.form[value.name].$error : null
+              $v.form[field.name].$dirty ? !$v.form[field.name].$error : null
             "
           >
             <template #label>
-              <span v-if="!value.label">
-                {{ $t(`modules.store.checkout.${value.name}`) }}
+              <span v-if="!field.label">
+                {{ $t(`modules.store.checkout.${field.name}`) }}
               </span>
               <span v-else>
-                {{ value.label }}
+                {{ field.label }}
               </span>
             </template>
             <template #default="data">
               <vf-a-input
-                v-if="value.type === 'text'"
-                v-model="form[value.name]"
+                v-if="field.type === 'text'"
+                v-model="form[field.name]"
                 v-bind="data"
                 trim
               />
               <vf-a-input
-                v-if="value.type === 'datetime'"
-                v-model="form[value.name]"
+                v-if="field.type === 'datetime'"
+                v-model="form[field.name]"
                 type="datetime-local"
                 v-bind="data"
                 trim
               />
               <vf-a-textarea
-                v-else-if="value.type === 'textarea'"
-                v-model="form[value.name]"
+                v-else-if="field.type === 'textarea'"
+                v-model="form[field.name]"
                 v-bind="data"
                 trim
               />
               <vf-a-select
-                v-else-if="value.type === 'select'"
-                v-model="form[value.name]"
+                v-else-if="field.type === 'select'"
+                v-model="form[field.name]"
                 :options="value.values"
                 v-bind="data"
                 no-select
               />
               <vf-a-radio-group
-                v-else-if="value.type === 'radio'"
-                v-model="form[value.name]"
-                :options="value.values"
+                v-else-if="field.type === 'radio'"
+                v-model="form[field.name]"
+                :options="field.values"
                 v-bind="data"
                 stacked
               />
               <vf-a-checkbox-group
-                v-else-if="value.type === 'checkbox'"
-                v-model="form[value.name]"
-                :options="value.values"
+                v-else-if="field.type === 'checkbox'"
+                v-model="form[field.name]"
+                :options="field.values"
                 v-bind="data"
                 stacked
               />
@@ -77,13 +77,13 @@
                 v-bind="data"
               />
               <vf-a-timepicker
-                v-else-if="value.type === 'time'"
-                v-model="form[value.name]"
+                v-else-if="field.type === 'time'"
+                v-model="form[field.name]"
                 v-bind="data"
               />
               <vf-a-select
-                v-else-if="value.type === 'zone'"
-                v-model="form[value.name]"
+                v-else-if="field.type === 'zone'"
+                v-model="form[field.name]"
                 v-bind="data"
                 :options="zones.content"
                 value-field="id"
@@ -91,8 +91,8 @@
                 no-select
               />
               <vf-a-select
-                v-else-if="value.type === 'country'"
-                v-model="form[value.name]"
+                v-else-if="field.type === 'country'"
+                v-model="form[field.name]"
                 v-bind="data"
                 :options="countries.content"
                 value-field="id"
@@ -102,9 +102,9 @@
               />
             </template>
             <template #error>{{
-              $te(`modules.store.checkout.${value.name}Error`)
-                ? $t(`modules.store.checkout.${value.name}Error`)
-                : value.name
+              $te(`modules.store.checkout.${field.name}Error`)
+                ? $t(`modules.store.checkout.${field.name}Error`)
+                : field.name
             }}</template>
           </vf-m-field>
         </vf-m-col>
