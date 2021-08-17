@@ -1,6 +1,6 @@
 {
     "name": "@vuefront/checkout-app",
-    "version": "0.1.22",
+    "version": "0.1.23",
     "description": "VueFront app",
     "files": [
         "lib",
@@ -25,9 +25,7 @@
         "vuefront": "^0.3.61"
     },
     "dependencies": {
-        "lodash": "^4.17.21",
-        "vue": "^2.6.14",
-        "vuex": "^3.6.2"
+        "lodash": "^4.17.21"
     },
     "devDependencies": {
         "@babel/cli": "^7.14.5",
