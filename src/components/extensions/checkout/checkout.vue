@@ -54,195 +54,207 @@
     <vf-a-loader v-else />
   </div>
 </template>
-<script>
-import { validationMixin } from "vuelidate";
-import { mapGetters } from "vuex";
-import debounce from "lodash/debounce";
+<script lang="ts" setup>
+import useQuery from "vuefront/lib/utils/query";
+import debounce from "lodash-es/debounce";
 import isEmpty from "lodash/isEmpty";
-import gql from "graphql-tag";
+import {
+  computed,
+  inject,
+  nextTick,
+  onMounted,
+  reactive,
+  ref,
+  watch,
+} from "vue";
 import { mdiArrowRight } from "@mdi/js";
-export default {
-  mixins: [validationMixin],
-  data() {
-    return {
-      mdiArrowRight,
-      debounced: () => {},
-      response: {
-        shippingAddress: [],
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+import useVuelidate from "@vuelidate/core";
+
+const v$ = useVuelidate();
+const vfapollo = inject<any>("$vfapollo");
+const { query } = useQuery();
+let paymentAddress = reactive({});
+let shippingAddress = reactive({});
+let response = reactive({
+  shippingAddress: [],
+});
+let debounced: any = () => {};
+const updating = ref(false);
+const loading = ref(true);
+const paymentMethod = ref("");
+const paymentAddressId = ref("");
+const shippingMethod = ref("");
+const shippingAddressId = ref("");
+const store = useStore();
+const url = computed(() => store.getters["store/checkout/order/url"]);
+const error = computed(() => store.getters["vuefront/error"]);
+const cart = computed(() => store.getters["store/cart/get"]);
+const paymentZones = computed(
+  () => store.getters["store/checkout/paymentAddress/zones"]
+);
+const deliveryAddress = ref(true);
+const router = useRouter();
+const shippingZones = computed(
+  () => store.getters["store/checkout/shippingAddress/zones"]
+);
+const paymentAddressData = computed(() => {
+  let result = [];
+  for (const key in paymentAddress) {
+    result = [
+      ...result,
+      {
+        name: key,
+        value:
+          typeof paymentAddress[key] !== "string" &&
+          paymentAddress[key] !== null
+            ? JSON.stringify(paymentAddress[key])
+            : paymentAddress[key],
       },
-      loading: true,
-      deliveryAddress: true,
-      paymentMethod: "",
-      shippingMethod: "",
-      paymentAddress: {},
-      paymentAddressId: "",
-      shippingAddress: {},
-      shippingAddressId: "",
-      updating: false,
-    };
+    ];
+  }
+
+  return result;
+});
+
+const handleLoad = async () => {
+  await store.dispatch("store/checkout/order/create");
+  const { data } = await vfapollo.query({
+    query,
+  });
+  store.commit("store/cart/setCart", data.cart);
+  response = data;
+  loading.value = false;
+};
+
+const shippingAddressData = () => {
+  let result: any = [];
+
+  if (deliveryAddress) {
+    result = paymentAddressData;
+  } else {
+    for (const key in this.shippingAddress) {
+      result = [
+        ...result,
+        {
+          name: key,
+          value:
+            typeof shippingAddress[key] !== "string" &&
+            shippingAddress[key] !== null
+              ? JSON.stringify(shippingAddress[key])
+              : shippingAddress[key],
+        },
+      ];
+    }
+  }
+
+  return result;
+};
+
+const shippingAddressIdData = () => {
+  let result = null;
+
+  if (deliveryAddress.value) {
+    result = paymentAddressId.value;
+  } else {
+    result = shippingAddressId.value;
+  }
+
+  return result;
+};
+
+onMounted(() => {
+  handleLoad().then(() => {
+    setTimeout(() => {
+      debounced = debounce(updateOrder, 1000);
+    }, 1000);
+  });
+});
+
+watch(
+  () => cart,
+  (val, oldVal) => {
+    if (val !== oldVal) {
+      debounced();
+    }
   },
-  computed: {
-    ...mapGetters({
-      url: "store/checkout/order/url",
-      error: "vuefront/error",
-      cart: "store/cart/get",
-      paymentZones: "store/checkout/paymentAddress/zones",
-      shippingZones: "store/checkout/shippingAddress/zones",
-    }),
-    paymentAddressData() {
-      let result = [];
+  { deep: true }
+);
 
-      for (const key in this.paymentAddress) {
-        result = [
-          ...result,
-          {
-            name: key,
-            value:
-              typeof this.paymentAddress[key] !== "string" &&
-              this.paymentAddress[key] !== null
-                ? JSON.stringify(this.paymentAddress[key])
-                : this.paymentAddress[key],
-          },
-        ];
-      }
+const handlePaymentMethod = (val) => {
+  paymentMethod.value = val;
+  debounced();
+};
+const handleShippingMethod = (val) => {
+  shippingMethod.value = val;
+  debounced();
+};
+const updatePaymentAddress = ({ addressId, address }) => {
+  paymentAddress = address;
+  paymentAddressId.value = addressId;
+  debounced();
+};
+const updateShippingAddress = ({ addressId, address }) => {
+  shippingAddressId.value = addressId;
+  shippingAddress = address;
+  debounced();
+};
 
-      return result;
-    },
-    shippingAddressData() {
-      let result = [];
+const updateOrder = async () => {
+  updating.value = true;
+  const data = await store.dispatch("store/checkout/order/update", {
+    paymentAddress: paymentAddressData.value,
+    paymentAddressId: paymentAddressId.value,
+    shippingAddress: shippingAddressData,
+    shippingAddressId: shippingAddressIdData,
+    paymentMethod: paymentMethod.value,
+    shippingMethod: shippingMethod.value,
+  });
+  if (data) {
+    response = { ...response, ...data.updateOrder };
+  }
+  updating.value = false;
+};
 
-      if (this.deliveryAddress) {
-        result = this.paymentAddressData;
-      } else {
-        for (const key in this.shippingAddress) {
-          result = [
-            ...result,
-            {
-              name: key,
-              value:
-                typeof this.shippingAddress[key] !== "string" &&
-                this.shippingAddress[key] !== null
-                  ? JSON.stringify(this.shippingAddress[key])
-                  : this.shippingAddress[key],
-            },
-          ];
-        }
-      }
-
-      return result;
-    },
-    shippingAddressIdData() {
-      let result = null;
-
-      if (this.deliveryAddress) {
-        result = this.paymentAddressId;
-      } else {
-        result = this.shippingAddressId;
-      }
-
-      return result;
-    },
-  },
-  watch: {
-    cart: {
-      handler(val, oldVal) {
-        if (val !== oldVal) {
-          this.debounced();
-        }
-      },
-      deep: true,
-    },
-  },
-  mounted() {
-    this.handleLoad().then(() => {
-      setTimeout(() => {
-        this.debounced = debounce(this.updateOrder, 1000);
-      }, 1000);
-    });
-  },
-
-  methods: {
-    async handleLoad() {
-      await this.$store.dispatch("store/checkout/order/create");
-      const { data } = await this.$vfapollo.query({
-        query: this.$options.query,
-      });
-      this.$store.commit("store/cart/setCart", data.cart);
-      this.response = data;
-      this.loading = false;
-    },
-    handlePaymentMethod(val) {
-      this.paymentMethod = val;
-      this.debounced();
-    },
-    handleShippingMethod(val) {
-      this.shippingMethod = val;
-      this.debounced();
-    },
-    updatePaymentAddress({ addressId, address }) {
-      this.paymentAddress = address;
-      this.paymentAddressId = addressId;
-      this.debounced();
-    },
-    updateShippingAddress({ addressId, address }) {
-      this.shippingAddressId = addressId;
-      this.shippingAddress = address;
-      this.debounced();
-    },
-    async updateOrder() {
-      this.updating = true;
-      const data = await this.$store.dispatch("store/checkout/order/update", {
-        paymentAddress: this.paymentAddressData,
-        paymentAddressId: this.paymentAddressId,
-        shippingAddress: this.shippingAddressData,
-        shippingAddressId: this.shippingAddressIdData,
-        paymentMethod: this.paymentMethod,
-        shippingMethod: this.shippingMethod,
-      });
-      if (data) {
-        this.response = { ...this.response, ...data.updateOrder };
-      }
-      this.updating = false;
-    },
-    async onSubmit() {
-      this.$refs.paymentAddress.$v.$touch();
-      this.$refs.paymentMethods.$v.$touch();
-      this.$refs.shippingMethods.$v.$touch();
-
-      if (!this.deliveryAddress) {
-        this.$refs.shippingAddress.$v.$touch();
-      }
-
-      if (
-        !this.$refs.paymentAddress.$v.form.$invalid &&
-        !this.$refs.shippingMethods.$v.method.$invalid &&
-        !this.$refs.paymentMethods.$v.method.$invalid
-      ) {
-        if (
-          this.deliveryAddress ||
-          (!this.deliveryAddress &&
-            !this.$refs.shippingAddress.$v.form.$invalid)
-        ) {
-          this.updating = true;
-          await this.$store.dispatch("store/checkout/order/confirm");
-          this.updating = false;
-
-          if (isEmpty(this.error)) {
-            window.location.href = this.url;
-          }
-        }
-      }
-    },
-    handleLoaded(response) {
-      if (response.cart.products.length === 0) {
-        this.$router.push("/store/cart");
-      }
-      this.$store.commit("store/cart/setCart", response.cart);
-      this.$nextTick(() => {
-        this.response = { ...response };
-      });
-    },
-  },
+const refs = ref([]);
+console.log(refs);
+// const onSubmit = async () => {
+//   this.$refs.paymentAddress.$v.$touch();
+//   this.$refs.paymentMethods.$v.$touch();
+//   this.$refs.shippingMethods.$v.$touch();
+//
+//   if (!this.deliveryAddress) {
+//     this.$refs.shippingAddress.$v.$touch();
+//   }
+//
+//   if (
+//     !this.$refs.paymentAddress.$v.form.$invalid &&
+//     !this.$refs.shippingMethods.$v.method.$invalid &&
+//     !this.$refs.paymentMethods.$v.method.$invalid
+//   ) {
+//     if (
+//       deliveryAddress ||
+//       (!deliveryAddress && !this.$refs.shippingAddress.$v.form.$invalid)
+//     ) {
+//       updating.value = true;
+//       await store.dispatch("store/checkout/order/confirm");
+//       updating.value = false;
+//
+//       if (isEmpty(error)) {
+//         window.location.href = url.value;
+//       }
+//     }
+//   }
+// };
+const handleLoaded = (response) => {
+  if (response.cart.products.length === 0) {
+    router.push("/store/cart");
+  }
+  store.commit("store/cart/setCart", response.cart);
+  nextTick(() => {
+    response = { ...response };
+  });
 };
 </script>
 <graphql>
