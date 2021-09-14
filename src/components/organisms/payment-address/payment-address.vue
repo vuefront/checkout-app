@@ -119,98 +119,97 @@
     </vf-a-checkbox>
   </vf-m-card>
 </template>
-<script>
+<script lang="ts" setup>
 import { validationMixin } from "vuelidate";
 import find from "lodash/find";
 import required from "vuelidate/lib/validators/required";
+import {defineProps, ref} from "vue";
+import {useStore} from "vuex";
+const store = useStore()
+const props = defineProps({
+  value: {
+    type: Array,
+    default() {
+      return [];
+    },
+  },
+  schema: {
+    type: Array,
+    default() {
+      return [1];
+    },
+  },
+  hideSelectAddress: {
+    type: Boolean,
+    default() {
+      return false;
+    },
+  },
+  address: {
+    type: Object,
+    default() {
+      return null;
+    },
+  },
+  countries: {
+    type: Object,
+    default() {
+      return null;
+    },
+  },
+  zones: {
+    type: Object,
+    default() {
+      return null;
+    },
+  },
+  delivery: {
+    type: Boolean,
+    default() {
+      return true;
+    },
+  },
+});
+const form = {};
+for (const key in props.address.fields) {
+  let defaultValue = null;
+  if (props.address.fields[key].type === "checkbox") {
+    defaultValue = [];
+  }
+  if (props.address.fields[key].defaultValue) {
+    defaultValue = props.address.fields[key].defaultValue;
+  }
+  const fieldValue = find(props.value, {
+    name: props.address.fields[key].name,
+  });
+
+  if (fieldValue) {
+    try {
+      defaultValue = JSON.parse(fieldValue.value);
+      if (typeof defaultValue === "number") {
+        defaultValue = fieldValue.value;
+      }
+    } catch (e) {
+      defaultValue = fieldValue.value;
+    }
+  }
+
+  form[props.address.fields[key].name] = defaultValue;
+}
+
+if (form.country_id) {
+  store.dispatch("store/checkout/paymentAddress/zones", {
+    page: 1,
+    size: -1,
+    country_id: form.country_id,
+  });
+}
+
+const selectedAddress = ref(null)
+const deliveryAddress = ref(true)
+const agree = ref(null)
 export default {
   mixins: [validationMixin],
-  props: {
-    value: {
-      type: Array,
-      default() {
-        return [];
-      },
-    },
-    schema: {
-      type: Array,
-      default() {
-        return [1];
-      },
-    },
-    hideSelectAddress: {
-      type: Boolean,
-      default() {
-        return false;
-      },
-    },
-    address: {
-      type: Object,
-      default() {
-        return null;
-      },
-    },
-    countries: {
-      type: Object,
-      default() {
-        return null;
-      },
-    },
-    zones: {
-      type: Object,
-      default() {
-        return null;
-      },
-    },
-    delivery: {
-      type: Boolean,
-      default() {
-        return true;
-      },
-    },
-  },
-  data() {
-    const form = {};
-    for (const key in this.address.fields) {
-      let defaultValue = null;
-      if (this.address.fields[key].type === "checkbox") {
-        defaultValue = [];
-      }
-      if (this.address.fields[key].defaultValue) {
-        defaultValue = this.address.fields[key].defaultValue;
-      }
-      const fieldValue = find(this.value, {
-        name: this.address.fields[key].name,
-      });
-
-      if (fieldValue) {
-        try {
-          defaultValue = JSON.parse(fieldValue.value);
-          if (typeof defaultValue === "number") {
-            defaultValue = fieldValue.value;
-          }
-        } catch (e) {
-          defaultValue = fieldValue.value;
-        }
-      }
-
-      form[this.address.fields[key].name] = defaultValue;
-    }
-    if (form.country_id) {
-      this.$store.dispatch("store/checkout/paymentAddress/zones", {
-        page: 1,
-        size: -1,
-        country_id: form.country_id,
-      });
-    }
-
-    return {
-      selectedAddress: null,
-      deliveryAddress: true,
-      agree: null,
-      form,
-    };
-  },
   computed: {
     getFields() {
       const result = [];

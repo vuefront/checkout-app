@@ -26,34 +26,40 @@
     </div>
   </vf-m-card>
 </template>
-<script>
-export default {
-  props: ["cart", "totals"],
-  data() {
-    return {
-      fields: [
-        {
-          key: "product",
-          sortable: false,
-        },
-        {
-          key: "price",
-          sortable: false,
-        },
-        {
-          key: "quantity",
-          sortable: false,
-        },
-        {
-          key: "total",
-          sortable: false,
-        },
-        {
-          key: "action",
-          sortable: false,
-        },
-      ],
-    };
+<script lang="ts" setup>
+import { defineProps } from "vue";
+
+const props = defineProps({
+  cart: {
+    type: Object,
+    default: () => null,
   },
-};
+  totals: {
+    type: Array,
+    default: () => [],
+  },
+});
+
+const fields = [
+  {
+    key: "product",
+    sortable: false,
+  },
+  {
+    key: "price",
+    sortable: false,
+  },
+  {
+    key: "quantity",
+    sortable: false,
+  },
+  {
+    key: "total",
+    sortable: false,
+  },
+  {
+    key: "action",
+    sortable: false,
+  },
+];
 </script>

@@ -44,29 +44,25 @@
     </div>
   </div>
 </template>
-<script>
+<script lang="ts" setup>
 import placeholder from "vuefront/assets/img/placeholder.png";
+import { computed, defineProps } from "vue";
+const props = defineProps({
+  product: {
+    type: Object,
+    default() {
+      return null;
+    },
+  },
+});
 
-export default {
-  props: {
-    product: {
-      type: Object,
-      default() {
-        return null;
-      },
-    },
-  },
-  computed: {
-    image() {
-      return this.product.product.image !== ""
-        ? this.product.product.image
-        : placeholder;
-    },
-    imageLazy() {
-      return this.product.product.imageLazy !== ""
-        ? this.product.product.imageLazy
-        : placeholder;
-    },
-  },
-};
+const image = computed(() =>
+  props.product.product.image !== "" ? props.product.product.image : placeholder
+);
+
+const imageLazy = computed(() =>
+  props.product.product.imageLazy !== ""
+    ? props.product.product.imageLazy
+    : placeholder
+);
 </script>

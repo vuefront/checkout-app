@@ -9,55 +9,51 @@
     </vf-o-apollo>
   </div>
 </template>
-<script>
-export default { 
-  props: {
-    value: {
-      type: String,
-      default() {
-        return null;
+<script lang="ts" setup>
+import { computed, defineProps, reactive } from "vue";
+import { useI18n } from "vue-i18n";
+import { useStore } from "vuex";
+
+const i18n = useI18n();
+const store = useStore();
+const props = defineProps({
+  value: {
+    type: String,
+    default() {
+      return null;
+    },
+  },
+});
+const emits = defineEmits(["input"]);
+let addressList = reactive([]);
+const options = computed(() => {
+  let result = [];
+  for (const key in addressList) {
+    const value = addressList[key];
+    result = [
+      ...result,
+      {
+        value: value.id,
+        text: `${value.firstName} ${value.lastName} ${value.address1}`,
       },
-    },
-  },
-  data() {
-    return {
-      addressList: [],
-    };
-  },
-  computed: {
-    options() {
-      let result = [];
+    ];
+  }
 
-      for (const key in this.addressList) {
-        const value = this.addressList[key];
-        result = [
-          ...result,
-          {
-            value: value.id,
-            text: `${value.firstName} ${value.lastName} ${value.address1}`,
-          },
-        ];
-      }
+  result = [
+    ...result,
+    {
+      text: i18n.t("modules.store.checkout.text_new_address"),
+      value: null,
+    },
+  ];
 
-      result = [
-        ...result,
-        {
-          text: this.$t("modules.store.checkout.text_new_address"),
-          value: null,
-        },
-      ];
-
-      return result;
-    },
-  },
-  methods: {
-    handleLoaded(data) {
-      this.addressList = data.accountAddressList;
-    },
-    handleInput(value) {
-      this.$emit("input", value);
-    },
-  },
+  return result;
+});
+const handleLoaded = (data: { accountAddressList: any[] }) => {
+  addressList = data.accountAddressList;
+};
+const handleInput = (value) => {
+  emits("input", value);
 };
 </script>
 <graphql>
