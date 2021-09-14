@@ -1,12 +1,21 @@
-module.exports = {
-  extends: ["@nuxtjs/eslint-config-typescript", "plugin:prettier/recommended"],
-  plugins: ["prettier"],
-  rules: {
-    "@typescript-eslint/no-unused-vars": "off",
-    "no-unused-vars": "off",
-    "no-console": "off",
-    camelcase: "off",
-    "vue/max-attributes-per-line": "off",
-    "vue/require-prop-types": "off",
+{
+  "root": true,
+  "env": {
+    "node": true,
+    "browser": true
   },
-};
+  "parser": "vue-eslint-parser",
+  "parserOptions": {
+    "parser": "@typescript-eslint/parser",
+    "ecmaVersion": 2021,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "extends": [
+    "plugin:vue/vue3-essential",
+    "prettier",
+    "plugin:prettier/recommended"
+  ]
+}
