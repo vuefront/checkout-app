@@ -8,7 +8,8 @@
       v-model="selectedAddress"
       class="mb-3"
     />
-    <template v-if="!selectedAddress || hideSelectAddress">
+    <vf-a-loader v-if="!zonesLoaded"></vf-a-loader>
+    <template v-else-if="!selectedAddress || hideSelectAddress">
       <vf-m-row v-for="(row, rowKey) in getFields" :key="`row_${rowKey}`">
         <vf-m-col
           v-for="(field, index) in row"
@@ -88,6 +89,7 @@
                 :options="zones.content"
                 value-field="id"
                 text-field="name"
+                :class="form[field.name]"
                 no-select
               />
               <vf-a-select
@@ -110,6 +112,7 @@
         </vf-m-col>
       </vf-m-row>
     </template>
+
     <vf-a-checkbox v-if="delivery" v-model="deliveryAddress">
       {{ $t(`modules.store.checkout.deliveryAddress`) }}
     </vf-a-checkbox>
@@ -196,17 +199,11 @@ export default {
 
       form[this.address.fields[key].name] = defaultValue;
     }
-    if (form.country_id) {
-      this.$store.dispatch("store/checkout/paymentAddress/zones", {
-        page: 1,
-        size: -1,
-        country_id: form.country_id,
-      });
-    }
 
     return {
       selectedAddress: null,
       deliveryAddress: true,
+      zonesLoaded: !form.country_id,
       agree: null,
       form,
     };
@@ -250,6 +247,9 @@ export default {
   watch: {
     form: {
       handler(value, oldValue) {
+        console.log("change form");
+        console.log(value);
+
         this.$emit("input", {
           addressId: this.selectedAddress,
           address: value,
@@ -270,6 +270,17 @@ export default {
     },
   },
   mounted() {
+    if (this.form.country_id) {
+      this.$store
+        .dispatch("store/checkout/paymentAddress/zones", {
+          page: 1,
+          size: -1,
+          country_id: this.form.country_id,
+        })
+        .then(() => {
+          this.zonesLoaded = true;
+        });
+    }
     this.$emit("input", {
       addressId: this.selectedAddress,
       address: this.form,

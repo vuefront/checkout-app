@@ -8,7 +8,8 @@
       v-model="selectedAddress"
       class="mb-3"
     />
-    <template v-if="!selectedAddress || hideSelectAddress">
+    <vf-a-loader v-if="!zonesLoaded"></vf-a-loader>
+    <template v-else-if="!selectedAddress || hideSelectAddress">
       <vf-m-row v-for="(row, rowKey) in getFields" :key="`row_${rowKey}`">
         <vf-m-col
           v-for="(value, index) in row"
@@ -190,17 +191,10 @@ export default {
       form[this.address[key].name] = defaultValue;
     }
 
-    if (form.country_id) {
-      this.$store.dispatch("store/checkout/shippingAddress/zones", {
-        page: 1,
-        size: -1,
-        country_id: form.country_id,
-      });
-    }
-
     return {
       form,
       selectedAddress: null,
+      zonesLoaded: !form.country_id,
     };
   },
   computed: {
@@ -257,6 +251,17 @@ export default {
     },
   },
   mounted() {
+    if (this.form.country_id) {
+      this.$store
+        .dispatch("store/checkout/paymentAddress/zones", {
+          page: 1,
+          size: -1,
+          country_id: this.form.country_id,
+        })
+        .then(() => {
+          this.zonesLoaded = true;
+        });
+    }
     this.$emit("input", {
       addressId: this.selectedAddress,
       address: this.form,
