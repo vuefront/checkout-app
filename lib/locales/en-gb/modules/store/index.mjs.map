@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../../../src/locales/en-gb/modules/store/index.ts"],"names":["checkout"],"mappings":"AAAA,OAAOA,QAAP;AACA,eAAe;AACbA,EAAAA;AADa,CAAf","sourcesContent":["import checkout from \"./checkout.json\";\nexport default {\n  checkout,\n};\n"],"file":"index.mjs"}

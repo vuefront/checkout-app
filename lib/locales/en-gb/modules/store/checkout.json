@@ -1,7 +1,9 @@
 {
   "paymentMethodsTitle": "Payment Methods",
+  "paymentMethodsError": "Please select payment method!",
   "paymentAddressTitle": "Payment Address",
   "shippingMethodsTitle": "Shipping Methods",
+  "shippingMethodsError": "Please select shipping method!",
   "shippingAddressTitle": "Shipping Address",
   "cartTitle": "Cart",
   "firstName": "First Name",

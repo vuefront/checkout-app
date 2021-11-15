@@ -4,60 +4,56 @@
       <vf-a-radio-group
         :options="options"
         stacked
-        @input="handleInput"
+        @update:modelValue="handleInput"
       ></vf-a-radio-group>
     </vf-o-apollo>
   </div>
 </template>
-<script>
-export default {
-  props: {
-    value: {
-      type: String,
-      default() {
-        return null;
-      },
+<script lang="ts" setup>
+import { computed, reactive, PropType } from "vue";
+import { useI18n } from "vue-i18n";
+import { AccountAddress } from "vuefront-api";
+const i18n = useI18n();
+defineProps({
+  value: {
+    type: Object as PropType<AccountAddress>,
+    default() {
+      return null;
     },
   },
-  data() {
-    return {
-      addressList: [],
-    };
-  },
-  computed: {
-    options() {
-      let result = [];
-
-      for (const key in this.addressList) {
-        const value = this.addressList[key];
-        result = [
-          ...result,
-          {
-            value: value.id,
-            text: `${value.firstName} ${value.lastName} ${value.address1}`,
-          },
-        ];
-      }
-
+});
+const emits = defineEmits(["input"]);
+let addressList = reactive<AccountAddress[]>([]);
+const options = computed<{ value: string | null; text: string }[]>(() => {
+  let result: { value: string | null; text: string }[] = [];
+  for (const key in addressList) {
+    const value = addressList[key];
+    if (value.id) {
       result = [
         ...result,
         {
-          text: this.$t("modules.store.checkout.text_new_address"),
-          value: null,
+          value: value.id,
+          text: `${value.firstName} ${value.lastName} ${value.address1}`,
         },
       ];
+    }
+  }
 
-      return result;
+  result = [
+    ...result,
+    {
+      text: i18n.t("modules.store.checkout.text_new_address"),
+      value: null,
     },
-  },
-  methods: {
-    handleLoaded(data) {
-      this.addressList = data.accountAddressList;
-    },
-    handleInput(value) {
-      this.$emit("input", value);
-    },
-  },
+  ];
+
+  return result;
+});
+const handleLoaded = (data: { accountAddressList: AccountAddress[] }) => {
+  addressList = data.accountAddressList;
+};
+const handleInput = (value: any) => {
+  emits("input", value);
 };
 </script>
 <graphql>

@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/locales/index.ts"],"names":["EnGb","RuRu"],"mappings":"OAAO,KAAKA,I;OACL,KAAKC,I;AAEZ,SAASD,IAAT,EAAeC,IAAf","sourcesContent":["import * as EnGb from \"./en-gb\";\nimport * as RuRu from \"./ru-ru\";\n\nexport { EnGb, RuRu };\n"],"file":"index.mjs"}

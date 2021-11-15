@@ -5,8 +5,8 @@
   >
     <div class="vf-e-store-checkout__cart__products">
       <vf-o-checkout-cart-product
-        v-for="item in cart.products"
-        :key="item.key"
+        v-for="(item, index) in cart.products"
+        :key="index"
         :product="item"
       />
     </div>
@@ -26,34 +26,17 @@
     </div>
   </vf-m-card>
 </template>
-<script>
-export default {
-  props: ["cart", "totals"],
-  data() {
-    return {
-      fields: [
-        {
-          key: "product",
-          sortable: false,
-        },
-        {
-          key: "price",
-          sortable: false,
-        },
-        {
-          key: "quantity",
-          sortable: false,
-        },
-        {
-          key: "total",
-          sortable: false,
-        },
-        {
-          key: "action",
-          sortable: false,
-        },
-      ],
-    };
+<script lang="ts" setup>
+import { PropType } from "vue";
+import { Cart, Total } from "vuefront-api";
+defineProps({
+  cart: {
+    type: Object as PropType<Cart>,
+    default: () => null,
   },
-};
+  totals: {
+    type: Array as PropType<Total[]>,
+    default: () => [],
+  },
+});
 </script>

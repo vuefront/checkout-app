@@ -8,53 +8,66 @@
       <vf-a-radio
         v-model="method"
         name="shipping-method"
-        :state="$v.method.$dirty ? !$v.method.$error : null"
+        :state="v$.method.$dirty ? !v$.method.$error : null"
         :value="value.codename"
         >{{ value.name }}</vf-a-radio
       >
     </div>
   </vf-m-card>
 </template>
-<script>
-import { validationMixin } from "vuelidate";
-import required from "vuelidate/lib/validators/required";
-export default {
-  mixins: [validationMixin],
-  props: {
-    autoSelect: {
-      type: Boolean,
-      default() {
-        return false;
-      },
-    },
-    methods: {
-      type: Array,
-      default() {
-        return [];
-      },
+<script lang="ts" setup>
+import { useVuelidate } from "@vuelidate/core";
+import { required, helpers } from "@vuelidate/validators";
+import { ref, watch, onMounted, PropType } from "vue";
+import { ShippingMethod } from "vuefront-api";
+import { useI18n } from "vue-i18n";
+const i18n = useI18n();
+const props = defineProps({
+  errorReference: {
+    type: String,
+    default() {
+      return null;
     },
   },
-  data() {
-    return {
-      method: null,
-    };
-  },
-  watch: {
-    method(value) {
-      this.$emit("input", value);
+  autoSelect: {
+    type: Boolean,
+    default() {
+      return false;
     },
   },
-  mounted() {
-    if (this.autoSelect && this.methods.length > 0) {
-      this.method = this.methods[0].codename;
-    }
+  methods: {
+    type: Array as PropType<ShippingMethod[]>,
+    default() {
+      return [];
+    },
   },
-  validations() {
-    return {
-      method: {
-        required,
-      },
-    };
+});
+const method = ref<string | null>(null);
+const emits = defineEmits(["input"]);
+watch(
+  () => method.value,
+  (value) => {
+    emits("input", value);
+  }
+);
+
+onMounted(() => {
+  if (props.autoSelect && props.methods.length > 0) {
+    method.value = props.methods[0].codename;
+  }
+});
+const v$ = useVuelidate(
+  {
+    method: {
+      required: helpers.withMessage(
+        i18n.t("modules.store.checkout.shippingMethodsError"),
+        required
+      ),
+    },
   },
-};
+  { method },
+  {
+    $registerAs: props.errorReference,
+  }
+);
 </script>

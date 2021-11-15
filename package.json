@@ -1,53 +1,67 @@
 {
     "name": "@vuefront/checkout-app",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "description": "VueFront app",
     "files": [
         "lib",
         "assets",
-        "src"
+        "src",
+        "types",
+        "index.js"
     ],
     "keywords": [
         "vuefront",
         "app",
         "vuefront-app"
     ],
-    "main": "lib/index.js",
+    "main": "index.js",
     "author": "VueFront",
     "license": "MIT",
     "scripts": {
-        "build": "shx mkdir -p lib && shx rm -r lib && cross-env BUILD_DEV=1 NODE_ENV=esm babel src -D --watch --verbose --out-dir lib && echo {} > lib/.babelrc",
-        "yalc-watch": "nodemon --delay 3 -e vue,js,scss,json -x yalc push",
-        "watch": "concurrently -k -p \"[{name}]\" -n \"Build,Yalc\" -c \"yellow.bold,cyan.bold\" \"npm run build\" \"npm run yalc-watch\"",
-        "lint": "eslint --fix \"src/**/*.vue\""
+        "build:lib": "cross-env  NODE_ENV=lib babel src --watch --out-dir lib --ignore \"**/__tests__\" --source-maps --extensions \".ts\",\".tsx\",\".snap\" --copy-files --no-copy-ignored --out-file-extension .mjs",
+        "yalc-watch": "nodemon --delay 6 -e vue,js,scss,json -x yalc push",
+        "watch": "concurrently -k -p \"[{name}]\" -n \"Build,Yalc\" -c \"yellow.bold,cyan.bold\" \"npm run build:lib\" \"npm run yalc-watch\""
     },
     "peerDependencies": {
-        "vuefront": "^0.3.61"
+        "fsevents": "^2.3.2",
+        "vuefront": "^0.5.0"
     },
     "dependencies": {
+        "@vuelidate/core": "^2.0.0-alpha.24",
+        "@vuelidate/validators": "^2.0.0-alpha.21",
+        "graphql-tag": "^2.12.5",
         "lodash": "^4.17.21"
     },
     "devDependencies": {
-        "@babel/cli": "^7.14.5",
-        "@babel/core": "^7.14.6",
-        "@babel/plugin-transform-modules-commonjs": "^7.14.5",
-        "@babel/plugin-transform-runtime": "^7.14.5",
-        "@babel/polyfill": "^7.12.1",
-        "@babel/preset-env": "^7.14.7",
-        "@nuxtjs/eslint-config": "^6.0.1",
-        "@nuxtjs/eslint-config-typescript": "^6.0.1",
-        "@typescript-eslint/parser": "^4.28.2",
-        "babel-plugin-minify-dead-code-elimination": "^0.5.1",
-        "babel-plugin-transform-inline-environment-variables": "^0.4.3",
-        "concurrently": "^6.2.0",
+        "@babel/cli": "^7.14.8",
+        "@babel/core": "^7.15.0",
+        "@babel/preset-env": "^7.15.0",
+        "@babel/preset-typescript": "^7.15.0",
+        "@mdi/js": "^6.1.95",
+        "@types/lodash": "^4.14.172",
+        "@types/node": "^16.9.1",
+        "@typescript-eslint/eslint-plugin": "^4.30.0",
+        "@typescript-eslint/parser": "^4.30.0",
+        "autoprefixer": "^10.3.7",
+        "babel-plugin-detective": "^2.0.0",
+        "babel-plugin-module-resolver": "^4.1.0",
+        "babel-plugin-transform-define": "^2.0.1",
+        "babel-plugin-transform-remove-imports": "^1.5.5",
+        "concurrently": "^6.2.1",
         "cross-env": "^7.0.3",
-        "eslint": "^7.30.0",
+        "eslint": "^7.32.0",
         "eslint-config-prettier": "^8.3.0",
-        "eslint-plugin-nuxt": "^2.0.0",
-        "eslint-plugin-prettier": "^3.4.0",
+        "eslint-plugin-prettier": "^4.0.0",
+        "eslint-plugin-vue": "^7.17.0",
+        "graphql": "^15.5.2",
         "nodemon": "^2.0.10",
         "prettier": "^2.3.2",
         "shx": "^0.3.3",
-        "typescript": "^4.3.5"
+        "typescript": "^4.4.2",
+        "vue": "^3.2.11",
+        "vue-i18n": "^9.2.0-beta.17",
+        "vue-router": "^4.0.11",
+        "vuefront": "^0.5.0",
+        "vuex": "^4.0.2"
     }
 }

@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/locales/en-gb/index.ts"],"names":["modules"],"mappings":"OAAOA,O;AACP,SAASA,OAAT","sourcesContent":["import modules from \"./modules\";\nexport { modules };\n"],"file":"index.mjs"}

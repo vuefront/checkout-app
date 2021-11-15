@@ -5,86 +5,85 @@
   >
     <vf-o-account-address-select
       v-if="!hideSelectAddress"
-      v-model="selectedAddress"
+      @input="handleChangeId"
       class="mb-3"
     />
-    <vf-a-loader v-if="!zonesLoaded"></vf-a-loader>
-    <template v-else-if="!selectedAddress || hideSelectAddress">
+    <template v-if="!id || hideSelectAddress">
       <vf-m-row v-for="(row, rowKey) in getFields" :key="`row_${rowKey}`">
         <vf-m-col
-          v-for="(value, index) in row"
+          v-for="(field, index) in row"
           :key="`col_${rowKey}_${index}`"
           xs="12"
           :md="12 / row.length"
         >
           <vf-m-field
-            :id="`input-shipping-address-${value.name}`"
+            :id="`input-shipping-address-${field.name}`"
             :state="
-              $v.form[value.name].$dirty ? !$v.form[value.name].$error : null
+              v$.form[field.name].$dirty ? !v$.form[field.name].$error : null
             "
           >
             <template #label>
-              <span v-if="!value.label">
-                {{ $t(`modules.store.checkout.${value.name}`) }}
+              <span v-if="!field.label">
+                {{ $t(`modules.store.checkout.${field.name}`) }}
               </span>
               <span v-else>
-                {{ value.label }}
+                {{ field.label }}
               </span>
             </template>
             <template #default="data">
               <vf-a-input
-                v-if="value.type === 'text'"
-                v-model="form[value.name]"
+                v-if="field.type === 'text'"
+                v-model="form[field.name]"
                 v-bind="data"
                 trim
               />
               <vf-a-input
-                v-if="value.type === 'datetime'"
-                v-model="form[value.name]"
+                v-if="field.type === 'datetime'"
+                v-model="form[field.name]"
                 type="datetime-local"
                 v-bind="data"
                 trim
               />
               <vf-a-textarea
-                v-else-if="value.type === 'textarea'"
-                v-model="form[value.name]"
+                v-else-if="field.type === 'textarea'"
+                v-model="form[field.name]"
                 v-bind="data"
                 trim
               />
               <vf-a-select
-                v-else-if="value.type === 'select'"
-                v-model="form[value.name]"
-                :options="value.values"
+                v-else-if="field.type === 'select'"
+                v-model="form[field.name]"
+                :options="field.values"
                 v-bind="data"
                 no-select
               />
               <vf-a-radio-group
-                v-else-if="value.type === 'radio'"
-                v-model="form[value.name]"
-                :options="value.values"
+                v-else-if="field.type === 'radio'"
+                v-model="form[field.name]"
+                :options="field.values"
                 v-bind="data"
                 stacked
               />
               <vf-a-checkbox-group
-                v-else-if="value.type === 'checkbox'"
-                v-model="form[value.name]"
-                :options="value.values"
+                v-else-if="field.type === 'checkbox'"
+                v-model="form[field.name]"
+                :options="field.values"
                 v-bind="data"
                 stacked
               />
               <vf-a-datepicker
-                v-else-if="value.type === 'date'"
-                v-model="form[value.name]"
+                v-else-if="field.type === 'date'"
+                v-model="form[field.name]"
                 v-bind="data"
               />
               <vf-a-timepicker
-                v-else-if="value.type === 'time'"
-                v-model="form[value.name]"
+                v-else-if="field.type === 'time'"
+                v-model="form[field.name]"
                 v-bind="data"
               />
               <vf-a-select
-                v-else-if="value.type === 'zone'"
-                v-model="form[value.name]"
+                v-else-if="field.type === 'zone'"
+                v-model="form[field.name]"
                 v-bind="data"
                 :options="zones.content"
                 value-field="id"
@@ -92,22 +91,22 @@
                 no-select
               />
               <vf-a-select
-                v-else-if="value.type === 'country'"
-                v-model="form[value.name]"
+                v-else-if="field.type === 'country'"
+                v-model="form[field.name]"
                 v-bind="data"
                 :options="countries.content"
                 value-field="id"
                 text-field="name"
                 no-select
-                @input="handleChangeCountry"
+                @update:modelValue="handleChangeCountry"
               />
             </template>
             <template #error>
-              <span v-if="!value.label">
-                {{ $t(`modules.store.checkout.${value.name}Error`) }}
+              <span v-if="!field.label">
+                {{ $t(`modules.store.checkout.${field.name}Error`) }}
               </span>
               <span v-else>
-                {{ value.label }}
+                {{ field.label }}
                 {{ $t(`modules.store.checkout.requiredError`) }}
               </span>
             </template>
@@ -117,186 +116,221 @@
     </template>
   </vf-m-card>
 </template>
-<script>
-import { validationMixin } from "vuelidate";
-import find from "lodash/find";
-import required from "vuelidate/lib/validators/required";
-export default {
-  mixins: [validationMixin],
-  props: {
-    value: {
-      type: Array,
-      default() {
-        return [];
-      },
-    },
-    schema: {
-      type: Array,
-      default() {
-        return [1];
-      },
-    },
-    hideSelectAddress: {
-      type: Boolean,
-      default() {
-        return false;
-      },
-    },
-    address: {
-      type: Array,
-      default() {
-        return null;
-      },
-    },
-    countries: {
-      type: Object,
-      default() {
-        return null;
-      },
-    },
-    zones: {
-      type: Object,
-      default() {
-        return null;
-      },
+<script lang="ts" setup>
+import { useVuelidate, ValidationArgs } from "@vuelidate/core";
+import { find } from "lodash";
+import { required, helpers } from "@vuelidate/validators";
+import { ref, computed, PropType, watch, onMounted } from "vue";
+import { useStore } from "vuex";
+import { useI18n } from "vue-i18n";
+import { AddressField, InputField } from "vuefront-api";
+const store = useStore();
+const i18n = useI18n();
+type Schema = Array<number>;
+const props = defineProps({
+  errorReference: {
+    type: String,
+    default() {
+      return null;
     },
   },
-  data() {
-    const form = {};
+  address: {
+    type: Array as PropType<InputField[]>,
+    default() {
+      return [];
+    },
+  },
+  schema: {
+    type: Array as PropType<Schema>,
+    default() {
+      return [1];
+    },
+  },
+  hideSelectAddress: {
+    type: Boolean,
+    default() {
+      return false;
+    },
+  },
+  fields: {
+    type: Array as PropType<AddressField[]>,
+    default() {
+      return [];
+    },
+  },
+  countries: {
+    type: Object,
+    default() {
+      return null;
+    },
+  },
+  zones: {
+    type: Object,
+    default() {
+      return null;
+    },
+  },
+  delivery: {
+    type: Boolean,
+    default() {
+      return true;
+    },
+  },
+  id: {
+    type: String,
+    default() {
+      return null;
+    },
+  },
+});
+interface Form {
+  [x: string]: any;
+}
+const form: Form = ref({});
+if (props.fields) {
+  for (let key = 0; key < props.fields.length; key++) {
+    let defaultValue: any = null;
 
-    for (const key in this.address) {
-      let defaultValue = null;
-      if (this.address[key].type === "checkbox") {
-        defaultValue = [];
-      }
-      if (this.address[key].defaultValue) {
-        defaultValue = this.address[key].defaultValue;
-      }
-
-      const fieldValue = find(this.value, {
-        name: this.address[key].name,
-      });
-
-      if (fieldValue) {
-        try {
-          defaultValue = JSON.parse(fieldValue.value);
-          if (typeof defaultValue === "number") {
-            defaultValue = fieldValue.value;
-          }
-        } catch (e) {
-          defaultValue = fieldValue.value;
-        }
-      }
-
-      form[this.address[key].name] = defaultValue;
+    if (props.fields[key].type === "checkbox") {
+      defaultValue = [];
     }
-
-    return {
-      form,
-      selectedAddress: null,
-      zonesLoaded: !form.country_id,
-    };
-  },
-  computed: {
-    getFields() {
-      const result = [];
-      let r = 0;
-      const c = 0;
-      let countItems = 1;
-      let row = [];
-
-      if (r < this.schema.length) {
-        countItems = this.schema[r];
-      } else if (this.schema.length > 0) {
-        countItems = this.schema[this.schema.length - 1];
-      }
-
-      for (const key in this.address) {
-        if (row.length === countItems) {
-          result.push(row);
-          row = [];
-          r++;
-          if (r < this.schema.length) {
-            countItems = this.schema[r];
-          } else if (this.schema.length > 0) {
-            countItems = this.schema[this.schema.length - 1];
-          }
-        }
-
-        row.push(this.address[key]);
-      }
-
-      if (row.length > 0) {
-        result.push(row);
-      }
-
-      return result;
-    },
-  },
-  watch: {
-    form: {
-      handler(value, oldValue) {
-        this.$emit("input", {
-          addressId: this.selectedAddress,
-          address: value,
-        });
-      },
-      deep: true,
-    },
-    selectedAddress: {
-      handler(value, oldValue) {
-        this.$emit("input", { address: this.form, addressId: value });
-      },
-      deep: true,
-    },
-  },
-  mounted() {
-    if (this.form.country_id) {
-      this.$store
-        .dispatch("store/checkout/paymentAddress/zones", {
-          page: 1,
-          size: -1,
-          country_id: this.form.country_id,
-        })
-        .then(() => {
-          this.zonesLoaded = true;
-        });
+    if (props.fields[key].defaultValue) {
+      defaultValue = JSON.parse(JSON.stringify(props.fields[key].defaultValue));
     }
-    this.$emit("input", {
-      addressId: this.selectedAddress,
-      address: this.form,
+    const result = find(props.address, {
+      name: props.fields[key].name,
     });
-  },
-  validations() {
-    const fields = {};
-
-    if (this.selectedAddress) {
-      return {
-        form: {},
-      };
-    }
-
-    for (const key in this.address) {
-      fields[this.address[key].name] = {};
-      if (this.address[key].required) {
-        fields[this.address[key].name].required = required;
+    if (result) {
+      try {
+        defaultValue = JSON.parse(result.value || "");
+        if (typeof defaultValue === "number") {
+          defaultValue = result.value;
+        }
+      } catch (e) {
+        defaultValue = result.value;
       }
     }
 
-    return {
-      form: {
-        ...fields,
-      },
+    form.value[props.fields[key].name] = defaultValue;
+  }
+}
+
+const fields: ValidationArgs = {};
+
+if (props.id) {
+  form.value = {};
+}
+for (let key = 0; key < props.fields.length; key++) {
+  if (props.fields[key].required) {
+    fields[props.fields[key].name] = {
+      required: helpers.withMessage(
+        i18n.te(`modules.store.checkout.${props.fields[key].name}Error`)
+          ? i18n.t(`modules.store.checkout.${props.fields[key].name}Error`)
+          : props.fields[key].name,
+        required
+      ),
     };
+  } else {
+    fields[props.fields[key].name] = {};
+  }
+}
+
+const v$ = useVuelidate(
+  {
+    form: fields,
   },
-  methods: {
-    async handleChangeCountry(value) {
-      await this.$store.dispatch("store/checkout/shippingAddress/zones", {
-        page: 1,
-        size: -1,
-        country_id: value,
-      });
-    },
+  form,
+  {
+    $registerAs: props.errorReference,
+  }
+);
+
+if (form.value.country_id) {
+  store.dispatch("store/checkout/shippingAddress/zones", {
+    page: 1,
+    size: -1,
+    country_id: form.value.country_id,
+  });
+}
+
+const getFields = computed(() => {
+  const result = [];
+  let r = 0;
+  let countItems = 1;
+  let row = [];
+
+  if (r < props.schema.length) {
+    countItems = props.schema[r];
+  } else if (props.schema.length > 0) {
+    countItems = props.schema[props.schema.length - 1];
+  }
+
+  for (const key in props.fields) {
+    if (row.length === countItems) {
+      result.push(row);
+      row = [];
+      r++;
+      if (r < props.schema.length) {
+        countItems = props.schema[r];
+      } else if (props.schema.length > 0) {
+        countItems = props.schema[props.schema.length - 1];
+      }
+    }
+
+    if (props.fields[key]) row.push(props.fields[key]);
+  }
+
+  if (row.length > 0) {
+    result.push(row);
+  }
+
+  return result;
+});
+
+const getAddressFields = () => {
+  let result: { name: string; value: any }[] = [];
+  for (const key in form.value) {
+    if ((form.value as any)[key]) {
+      result = [
+        ...result,
+        {
+          name: key,
+          value:
+            typeof (form.value as any)[key] !== "string" &&
+            (form.value as any)[key] !== null
+              ? JSON.stringify((form.value as any)[key])
+              : (form.value as any)[key],
+        },
+      ];
+    }
+  }
+
+  return result;
+};
+
+const emits = defineEmits(["update:id", "update:address", "update:delivery"]);
+watch(
+  () => form.value,
+  (value) => {
+    emits("update:address", getAddressFields());
   },
+  {
+    deep: true,
+  }
+);
+
+const handleChangeId = (val: string) => {
+  emits("update:id", val);
+};
+onMounted(() => {
+  emits("update:address", getAddressFields());
+});
+
+const handleChangeCountry = async (value: string) => {
+  await store.dispatch("store/checkout/shippingAddress/zones", {
+    page: 1,
+    size: -1,
+    country_id: value,
+  });
 };
 </script>
