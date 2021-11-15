@@ -36,17 +36,25 @@
       </vf-m-media-body>
     </vf-m-media>
     <div class="vf-o-checkout-cart-product__quantity">
-      <vf-o-cart-quantity :cart-product="product" />
+      <vf-m-product-quantity
+        :quantity="product.quantity"
+        size="sm"
+        @change="handleChangeQuantity"
+      />
     </div>
 
     <div class="vf-o-checkout-cart-product__actions">
-      <vf-o-cart-actions :cart-product="product" />
+      <div class="vf-o-checkout-cart-product__remove" @click="handleRemove">
+        <vf-a-icon :icon="mdiTrashCanOutline" :size="16" />
+      </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import placeholder from "vuefront/assets/img/placeholder.png";
-import { computed, defineProps } from "vue";
+import { computed, inject } from "vue";
+import { useStore } from "vuex";
+import { mdiTrashCanOutline } from "@mdi/js";
+const vuefront$ = inject<any>("$vuefront");
 const props = defineProps({
   product: {
     type: Object,
@@ -57,12 +65,29 @@ const props = defineProps({
 });
 
 const image = computed(() =>
-  props.product.product.image !== "" ? props.product.product.image : placeholder
+  props.product.product.image !== ""
+    ? props.product.product.image
+    : vuefront$.images.placeholder.image
 );
 
 const imageLazy = computed(() =>
   props.product.product.imageLazy !== ""
     ? props.product.product.imageLazy
-    : placeholder
+    : vuefront$.images.placeholder.image
 );
+
+const store = useStore();
+
+const handleChangeQuantity = (e: number) => {
+  store.dispatch("store/cart/update", {
+    key: props.product.key,
+    quantity: Number(e),
+  });
+};
+
+const handleRemove = () => {
+  store.dispatch("store/cart/remove", {
+    key: props.product.key,
+  });
+};
 </script>

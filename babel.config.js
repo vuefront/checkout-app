@@ -1,9 +1,33 @@
+const vuefrontPackage = require("./package.json");
+
 module.exports = {
+  assumptions: {
+    noDocumentAll: true,
+  },
   presets: [
     [
       "@babel/preset-env",
       {
         modules: false,
+      },
+    ],
+    "@babel/preset-typescript",
+  ],
+  plugins: [
+    [
+      "transform-define",
+      {
+        __VUEFRONT_VERSION__: vuefrontPackage.version,
+        __REQUIRED_VUE__: vuefrontPackage.peerDependencies.vue,
+      },
+    ],
+    [
+      "module-resolver",
+      {
+        root: ["."],
+        alias: {
+          "@": "./src",
+        },
       },
     ],
   ],
@@ -14,35 +38,33 @@ module.exports = {
           "@babel/preset-env",
           {
             targets: { node: true },
+            modules: "commonjs",
           },
         ],
       ],
-      plugins: [
-        [
-          "module-resolver",
-          {
-            root: ["./src"],
-            alias: {
-              "~components": "components",
-              "~directives": "directives",
-              "~mixins": "mixins",
-              "~scss": "scss",
-              "~util": "util",
-            },
-          },
-        ],
-      ],
-    },
-    es5: {
-      presets: ["@babel/preset-env"],
     },
     lib: {
-      presets: [
+      plugins: [
         [
-          "@babel/preset-env",
+          "babel-plugin-transform-remove-imports",
           {
-            targets: "last 1 chrome version",
-            modules: false,
+            test: ["vuefront-api", "vuefront-store"],
+          },
+        ],
+        [
+          "./build/babel-plugin-add-import-extension",
+          {
+            extension: "mjs",
+            ignoreExtension: ["json"],
+          },
+        ],
+        [
+          "./build/babel-plugin-replace-import-extension",
+          {
+            extMapping: {
+              ".sass": ".css",
+              ".scss": ".css",
+            },
           },
         ],
       ],

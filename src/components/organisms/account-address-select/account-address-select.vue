@@ -4,39 +4,39 @@
       <vf-a-radio-group
         :options="options"
         stacked
-        @input="handleInput"
+        @update:modelValue="handleInput"
       ></vf-a-radio-group>
     </vf-o-apollo>
   </div>
 </template>
 <script lang="ts" setup>
-import { computed, defineProps, reactive } from "vue";
+import { computed, reactive, PropType } from "vue";
 import { useI18n } from "vue-i18n";
-import { useStore } from "vuex";
-
+import { AccountAddress } from "vuefront-api";
 const i18n = useI18n();
-const store = useStore();
-const props = defineProps({
+defineProps({
   value: {
-    type: String,
+    type: Object as PropType<AccountAddress>,
     default() {
       return null;
     },
   },
 });
 const emits = defineEmits(["input"]);
-let addressList = reactive([]);
-const options = computed(() => {
-  let result = [];
+let addressList = reactive<AccountAddress[]>([]);
+const options = computed<{ value: string | null; text: string }[]>(() => {
+  let result: { value: string | null; text: string }[] = [];
   for (const key in addressList) {
     const value = addressList[key];
-    result = [
-      ...result,
-      {
-        value: value.id,
-        text: `${value.firstName} ${value.lastName} ${value.address1}`,
-      },
-    ];
+    if (value.id) {
+      result = [
+        ...result,
+        {
+          value: value.id,
+          text: `${value.firstName} ${value.lastName} ${value.address1}`,
+        },
+      ];
+    }
   }
 
   result = [
@@ -49,10 +49,10 @@ const options = computed(() => {
 
   return result;
 });
-const handleLoaded = (data: { accountAddressList: any[] }) => {
+const handleLoaded = (data: { accountAddressList: AccountAddress[] }) => {
   addressList = data.accountAddressList;
 };
-const handleInput = (value) => {
+const handleInput = (value: any) => {
   emits("input", value);
 };
 </script>
