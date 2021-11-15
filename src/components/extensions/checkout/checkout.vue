@@ -55,7 +55,8 @@ const onSubmit = async () => {
   updating.value = true;
   await store.dispatch("store/checkout/order/confirm");
   updating.value = false;
-  if (isEmpty(error)) {
+
+  if (isEmpty(error.value)) {
     window.location.href = url.value;
   }
 };
