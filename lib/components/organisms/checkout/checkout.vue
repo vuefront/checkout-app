@@ -173,6 +173,8 @@ onMounted(() => {
 watch(
   () => props.cart,
   (val, oldVal) => {
+    console.log("props.cart");
+    console.log(props.cart);
     if (val !== oldVal) {
       emits("update", requestData.value);
     }
