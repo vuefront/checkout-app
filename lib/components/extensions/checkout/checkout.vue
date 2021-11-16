@@ -2,11 +2,11 @@
   <div class="vf-e-checkout">
     <vf-o-checkout
       v-if="!loading"
-      :cart="cart"
       :updating="updating"
       @update="updateOrder"
       @submit="onSubmit"
       v-bind="response"
+      :cart="cart"
     />
     <vf-a-loader v-else />
   </div>
