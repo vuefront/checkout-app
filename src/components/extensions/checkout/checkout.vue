@@ -156,9 +156,8 @@ export default {
   },
   mounted() {
     this.handleLoad().then(() => {
-      setTimeout(() => {
-        this.debounced = debounce(this.updateOrder, 1000);
-      }, 1000);
+      this.debounced = debounce(this.updateOrder, 1000);
+      this.loading = false;
     });
   },
 
@@ -170,8 +169,6 @@ export default {
       });
       this.$store.commit("store/cart/setCart", data.cart);
       this.response = data;
-      this.loading = false;
-      this.updating = false;
     },
     handlePaymentMethod(val) {
       this.paymentMethod = val;
