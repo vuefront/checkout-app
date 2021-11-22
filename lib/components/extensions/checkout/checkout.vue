@@ -171,6 +171,7 @@ export default {
       this.$store.commit("store/cart/setCart", data.cart);
       this.response = data;
       this.loading = false;
+      this.updating = false;
     },
     handlePaymentMethod(val) {
       this.paymentMethod = val;
