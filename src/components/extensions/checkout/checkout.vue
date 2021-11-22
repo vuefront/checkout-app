@@ -147,6 +147,7 @@ export default {
     cart: {
       handler(val, oldVal) {
         if (val !== oldVal) {
+          this.updating = true;
           this.debounced();
         }
       },
@@ -173,20 +174,24 @@ export default {
     },
     handlePaymentMethod(val) {
       this.paymentMethod = val;
+      this.updating = true;
       this.debounced();
     },
     handleShippingMethod(val) {
       this.shippingMethod = val;
+      this.updating = true;
       this.debounced();
     },
     updatePaymentAddress({ addressId, address }) {
       this.paymentAddress = address;
       this.paymentAddressId = addressId;
+      this.updating = true;
       this.debounced();
     },
     updateShippingAddress({ addressId, address }) {
       this.shippingAddressId = addressId;
       this.shippingAddress = address;
+      this.updating = true;
       this.debounced();
     },
     async updateOrder() {
