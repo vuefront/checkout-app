@@ -54,6 +54,13 @@ export default {
     if (this.autoSelect && this.methods.length > 0) {
       if (!this.value) {
         this.method = this.methods[0].codename;
+      } else if (
+        !includes(
+          this.methods.map((v) => v.codename),
+          this.value
+        )
+      ) {
+        this.method = this.methods[0].codename;
       }
     }
   },
