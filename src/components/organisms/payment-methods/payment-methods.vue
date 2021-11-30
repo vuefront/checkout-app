@@ -17,6 +17,7 @@
 <script>
 import { validationMixin } from "vuelidate";
 import required from "vuelidate/lib/validators/required";
+import includes from "lodash/includes";
 export default {
   mixins: [validationMixin],
   props: {
@@ -57,9 +58,16 @@ export default {
     }
   },
   validations() {
+    const payment = (value) =>
+      includes(
+        this.methods.map((v) => v.codename),
+        value
+      );
+
     return {
       method: {
         required,
+        payment,
       },
     };
   },
