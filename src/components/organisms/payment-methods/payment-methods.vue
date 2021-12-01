@@ -63,6 +63,7 @@ export default {
         this.method = this.methods[0].codename;
       }
     }
+    this.$emit("input", this.method);
   },
   validations() {
     const payment = (value) =>

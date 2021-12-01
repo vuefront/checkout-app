@@ -48,6 +48,7 @@ export default {
     if (this.autoSelect && this.methods.length > 0) {
       this.method = this.methods[0].codename;
     }
+    this.$emit("input", this.method);
   },
   validations() {
     return {
